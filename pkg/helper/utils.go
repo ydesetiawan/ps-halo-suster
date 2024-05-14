@@ -1,6 +1,8 @@
 package helper
 
 import (
+	"github.com/oklog/ulid/v2"
+	"math/rand"
 	"reflect"
 	"regexp"
 	"strconv"
@@ -149,11 +151,14 @@ func ValidateURL(fl validator.FieldLevel) bool {
 	return matched
 }
 
-// ValidateNIP checks if the NIP meets the specific criteria
-func ValidateNIP(fl validator.FieldLevel) bool {
+func ValidateNIPForIT(fl validator.FieldLevel) bool {
 	nipInt := fl.Field().Int()
 	nip := strconv.Itoa(int(nipInt))
 
+	return ValidatePrefixIT(nip)
+}
+
+func ValidatePrefixIT(nip string) bool {
 	// Check the length
 	if len(nip) != 13 {
 		return false
@@ -161,6 +166,40 @@ func ValidateNIP(fl validator.FieldLevel) bool {
 
 	// Check the prefix "615"
 	if nip[:3] != "615" {
+		return false
+	}
+
+	return true
+}
+
+func ValidatePrefixNurse(nip string) bool {
+	// Check the length
+	if len(nip) != 13 {
+		return false
+	}
+
+	// Check the prefix "303"
+	if nip[:3] != "303" {
+		return false
+	}
+
+	return true
+}
+
+func ValidateNIPForNurse(fl validator.FieldLevel) bool {
+	nipInt := fl.Field().Int()
+	nip := strconv.Itoa(int(nipInt))
+
+	return ValidatePrefixNurse(nip)
+}
+
+// ValidateNIP checks if the NIP meets the specific criteria
+func ValidateNIP(fl validator.FieldLevel) bool {
+	nipInt := fl.Field().Int()
+	nip := strconv.Itoa(int(nipInt))
+
+	// Check the length
+	if len(nip) != 13 {
 		return false
 	}
 
@@ -194,4 +233,12 @@ func ValidateNIP(fl validator.FieldLevel) bool {
 	}
 
 	return true
+}
+
+func GenerateULID() string {
+	entropy := rand.New(rand.NewSource(time.Now().UnixNano()))
+	ms := ulid.Timestamp(time.Now())
+
+	return ulid.MustNew(ms, entropy).String()
+
 }

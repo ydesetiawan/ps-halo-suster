@@ -1,9 +1,6 @@
 package model
 
 import (
-	"github.com/oklog/ulid/v2"
-	"math/rand"
-	"ps-halo-suster/internal/user/dto"
 	"time"
 )
 
@@ -23,16 +20,3 @@ const (
 	IT    Role = "it"
 	NURSE Role = "nurse"
 )
-
-func NewUser(req dto.RegisterReq) *User {
-	entropy := rand.New(rand.NewSource(time.Now().UnixNano()))
-	ms := ulid.Timestamp(time.Now())
-
-	return &User{
-		ID:       ulid.MustNew(ms, entropy).String(),
-		Name:     req.Name,
-		NIP:      req.NIP,
-		Password: req.Password,
-		Role:     req.Role,
-	}
-}

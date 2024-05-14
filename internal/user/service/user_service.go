@@ -6,12 +6,14 @@ import (
 	"ps-halo-suster/internal/user/repository"
 	"ps-halo-suster/pkg/bcrypt"
 	"ps-halo-suster/pkg/errs"
+	"ps-halo-suster/pkg/helper"
 	"ps-halo-suster/pkg/middleware"
 	"strconv"
 )
 
 type UserService interface {
-	RegisterUser(*dto.RegisterReq) (*dto.RegisterResp, error)
+	GetUserByIdAndRole(id string, role string) (model.User, error)
+	RegisterUser(user *model.User) (*dto.RegisterResp, error)
 	Login(*dto.LoginReq) (*dto.RegisterResp, error)
 }
 
@@ -25,40 +27,58 @@ func NewUserServiceImpl(userRepository repository.UserRepository) UserService {
 	}
 }
 
-func (s *userService) RegisterUser(req *dto.RegisterReq) (*dto.RegisterResp, error) {
-	hashedPassword, _ := bcrypt.HashPassword(req.Password)
-	req.Password = hashedPassword
-	req.Role = string(model.IT)
-	id, err := s.userRepository.RegisterUser(model.NewUser(*req))
+func (s *userService) GetUserByIdAndRole(id string, role string) (model.User, error) {
+	user, err := s.userRepository.GetUserByIDAndRole(id, role)
+	if err != nil {
+		return model.User{}, errs.NewErrUnauthorized("user has not role IT")
+	}
+	return user, err
+}
+
+func (s *userService) RegisterUser(user *model.User) (*dto.RegisterResp, error) {
+	hashedPassword, _ := bcrypt.HashPassword(user.Password)
+	user.Password = hashedPassword
+	id, err := s.userRepository.RegisterUser(user)
 
 	if err != nil {
 		return &dto.RegisterResp{}, err
 	}
-	token, _ := middleware.GenerateJWT(req.Role, id)
+	token, _ := middleware.GenerateJWT(id, user.Role)
 	return &dto.RegisterResp{
 		UserId:      id,
-		NIP:         req.NIP,
-		Name:        req.Name,
+		NIP:         user.NIP,
+		Name:        user.Name,
 		AccessToken: token,
 	}, nil
 }
 
 func (s *userService) Login(req *dto.LoginReq) (*dto.RegisterResp, error) {
-	//TODO validation request
-	usr, err := s.userRepository.GetUserByNIP(strconv.Itoa(req.NIP))
-	if err != nil {
-		return &dto.RegisterResp{}, errs.NewErrDataNotFound("user not found ", req.NIP, errs.ErrorData{})
-	}
-	err = bcrypt.ComparePassword(req.Password, usr.Password)
-	if err != nil {
-		return &dto.RegisterResp{}, errs.NewErrBadRequest("password is wrong ")
+	response := &dto.RegisterResp{}
+
+	nip := strconv.Itoa(req.NIP)
+	if model.IT == req.Role && !helper.ValidatePrefixIT(nip) {
+		return response, errs.NewErrDataNotFound("user is not from it (nip not starts with 615) ", req.NIP, errs.ErrorData{})
+	} else if model.NURSE == req.Role && !helper.ValidatePrefixNurse(nip) {
+		return response, errs.NewErrDataNotFound("user is not from nurse (nip not starts with 303) ", req.NIP, errs.ErrorData{})
 	}
 
-	token, _ := middleware.GenerateJWT(usr.Role, usr.ID)
+	user, err := s.userRepository.GetUserByNIPAndRole(nip, string(req.Role))
+	if err != nil {
+		return response, errs.NewErrDataNotFound("user not found ", req.NIP, errs.ErrorData{})
+	}
+	err = bcrypt.ComparePassword(req.Password, user.Password)
+	if err != nil {
+		return response, errs.NewErrBadRequest("password is wrong ")
+	}
 
-	return &dto.RegisterResp{
-		UserId:      usr.ID,
-		NIP:         usr.NIP,
+	token, _ := middleware.GenerateJWT(user.ID, user.Role)
+
+	response = &dto.RegisterResp{
+		UserId:      user.ID,
+		NIP:         user.NIP,
+		Name:        user.Name,
 		AccessToken: token,
-	}, nil
+	}
+
+	return response, nil
 }

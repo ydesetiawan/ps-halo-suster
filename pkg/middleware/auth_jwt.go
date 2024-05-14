@@ -30,15 +30,15 @@ func JWTAuthMiddleware(fn echo.HandlerFunc) echo.HandlerFunc {
 			return err
 		}
 
-		email, emailOk := claims["email"].(string)
 		userId, uidOk := claims["user_id"].(string)
-		if !emailOk || !uidOk {
+		role, roleOk := claims["role"].(string)
+		if !uidOk || !roleOk {
 			slog.Error("Invalid claims")
 			writeUnauthorized(c.Response())
 			return err
 		}
 
-		user, err := constructUserInfo(email, userId)
+		user, err := constructUserInfo(userId, role)
 		if err != nil {
 			slog.Error("Failed to construct user info", "error", err)
 			writeUnauthorized(c.Response())
@@ -71,16 +71,16 @@ func extractJWTTokenFromHeader(r *http.Request) (string, error) {
 }
 
 type Claims struct {
-	Email  string `json:"email"`
 	UserId string `json:"user_id"`
+	Role   string `json:"role"`
 	jwt.Claims
 }
 
-func GenerateJWT(email string, userId string) (string, error) {
+func GenerateJWT(userId string, role string) (string, error) {
 	// Create token
 	claims := Claims{
-		Email:  email,
 		UserId: userId,
+		Role:   role,
 		Claims: jwt.MapClaims{
 			"exp": time.Now().Add(time.Hour * 24).Unix(), // Token expires in 24 hours
 		},
@@ -92,10 +92,10 @@ func GenerateJWT(email string, userId string) (string, error) {
 	return token.SignedString(jwtKey)
 }
 
-func constructUserInfo(email string, userId string) (map[string]interface{}, error) {
+func constructUserInfo(userId string, role string) (map[string]interface{}, error) {
 	return map[string]interface{}{
-		"email":   email,
 		"user_id": userId,
+		"role":    role,
 	}, nil
 }
 
