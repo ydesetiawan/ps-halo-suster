@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"encoding/json"
 	"github.com/labstack/echo/v4"
 	"ps-halo-suster/internal/user/dto"
 	"ps-halo-suster/internal/user/service"
@@ -10,20 +9,18 @@ import (
 )
 
 type UserHandler struct {
-	userService *service.UserService
+	userService service.UserService
 }
 
-func NewUserHandler(userService *service.UserService) *UserHandler {
+func NewUserHandler(userService service.UserService) *UserHandler {
 	return &UserHandler{
 		userService: userService,
 	}
 }
 
 func (h *UserHandler) Register(ctx echo.Context) *response.WebResponse {
-	var request dto.RegisterReq
-	jsonString, _ := json.Marshal(ctx.Request().Body)
-	err := json.Unmarshal(jsonString, &request)
-	helper.Panic400IfError(err)
+	var request = new(dto.RegisterReq)
+	err := ctx.Bind(&request)
 
 	err = dto.ValidateRegisterReq(request)
 	helper.Panic400IfError(err)
@@ -39,10 +36,8 @@ func (h *UserHandler) Register(ctx echo.Context) *response.WebResponse {
 }
 
 func (h *UserHandler) Login(ctx echo.Context) *response.WebResponse {
-	var request dto.LoginReq
-	jsonString, _ := json.Marshal(ctx.Request().Body)
-	err := json.Unmarshal(jsonString, &request)
-	helper.Panic400IfError(err)
+	var request = new(dto.LoginReq)
+	err := ctx.Bind(&request)
 
 	err = dto.ValidateLoginReq(request)
 	helper.Panic400IfError(err)

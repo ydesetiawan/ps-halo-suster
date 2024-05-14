@@ -1,30 +1,37 @@
 package dto
 
-import "github.com/go-playground/validator/v10"
+import (
+	"github.com/go-playground/validator/v10"
+	"ps-halo-suster/pkg/helper"
+)
 
 type LoginReq struct {
-	PhoneNumber string `json:"phoneNumber" validate:"required"`
-	Password    string `json:"password" validate:"required,min=5,max=15"`
+	NIP      int    `json:"nip" validate:"required,validateNip"`
+	Password string `json:"password" validate:"required,min=5,max=15"`
 }
 
-func ValidateLoginReq(loginReq LoginReq) error {
+func ValidateLoginReq(loginReq *LoginReq) error {
 	validate := validator.New()
+	validate.RegisterValidation("validateNip", helper.ValidateNIP)
 	return validate.Struct(loginReq)
 }
 
 type RegisterReq struct {
-	PhoneNumber string `json:"phoneNumber" validate:"required,max=30,e164"`
-	Password    string `json:"password" validate:"required,min=5,max=15"`
-	Name        string `json:"name" validate:"required,min=5,max=50"`
+	NIP      int    `json:"nip" validate:"required,validateNip"`
+	Name     string `json:"name" validate:"required,min=5,max=50"`
+	Password string `json:"password" validate:"required,min=5,max=15"`
+	Role     string `json:"-"`
 }
 
-func ValidateRegisterReq(req RegisterReq) error {
+func ValidateRegisterReq(req *RegisterReq) error {
 	validate := validator.New()
+	validate.RegisterValidation("validateNip", helper.ValidateNIP)
 	return validate.Struct(req)
 }
 
 type RegisterResp struct {
+	UserId      string `json:"userId"`
+	NIP         int    `json:"nip"`
 	Name        string `json:"name"`
-	PhoneNumber string `json:"phoneNumber"`
 	AccessToken string `json:"accessToken"`
 }

@@ -18,6 +18,7 @@ require (
 	golang.org/x/crypto v0.22.0
 	golang.org/x/exp v0.0.0-20240416160154-fe59bbe5cc7f
 	gorm.io/gorm v1.25.10
+	github.com/oklog/ulid/v2 v2.1.0
 )
 
 require (

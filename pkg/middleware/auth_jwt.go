@@ -31,7 +31,7 @@ func JWTAuthMiddleware(fn echo.HandlerFunc) echo.HandlerFunc {
 		}
 
 		email, emailOk := claims["email"].(string)
-		userId, uidOk := claims["user_id"].(float64)
+		userId, uidOk := claims["user_id"].(string)
 		if !emailOk || !uidOk {
 			slog.Error("Invalid claims")
 			writeUnauthorized(c.Response())
@@ -72,11 +72,11 @@ func extractJWTTokenFromHeader(r *http.Request) (string, error) {
 
 type Claims struct {
 	Email  string `json:"email"`
-	UserId int64  `json:"user_id"`
+	UserId string `json:"user_id"`
 	jwt.Claims
 }
 
-func GenerateJWT(email string, userId int64) (string, error) {
+func GenerateJWT(email string, userId string) (string, error) {
 	// Create token
 	claims := Claims{
 		Email:  email,
@@ -92,10 +92,10 @@ func GenerateJWT(email string, userId int64) (string, error) {
 	return token.SignedString(jwtKey)
 }
 
-func constructUserInfo(email string, userId float64) (map[string]interface{}, error) {
+func constructUserInfo(email string, userId string) (map[string]interface{}, error) {
 	return map[string]interface{}{
 		"email":   email,
-		"user_id": int64(userId),
+		"user_id": userId,
 	}, nil
 }
 

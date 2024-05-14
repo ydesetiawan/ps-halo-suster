@@ -1,4 +1,5 @@
 DROP INDEX IF EXISTS idx_user_name;
-DROP INDEX IF EXISTS idx_user_phone_number;
+DROP INDEX IF EXISTS idx_user_nip;
+DROP INDEX IF EXISTS idx_user_role;
 
 DROP TABLE IF EXISTS users;

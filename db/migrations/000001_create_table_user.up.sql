@@ -1,10 +1,13 @@
 CREATE TABLE users (
-    id bigserial PRIMARY KEY,
-    name VARCHAR(50),
-    phone_number VARCHAR(30) NOT NULL CHECK (length(phone_number) > 0 AND length(phone_number) <= 30) UNIQUE,
+    id char(26) PRIMARY KEY,
+    nip VARCHAR(20) NOT NULL UNIQUE,
+    name VARCHAR(50) NOT NULL,
     password VARCHAR(100),
+    role VARCHAR(10) NOT NULL,
+    identity_card_scan_img TEXT,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE INDEX IF NOT EXISTS idx_user_name ON users (name);
-CREATE INDEX IF NOT EXISTS idx_user_phone_number ON users (phone_number);
+CREATE INDEX IF NOT EXISTS idx_user_nip ON users (nip);
+CREATE INDEX IF NOT EXISTS idx_user_role ON users (role);

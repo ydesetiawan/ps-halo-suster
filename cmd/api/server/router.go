@@ -10,6 +10,6 @@ func (s *Server) setupRouter(e *echo.Echo) {
 	v1.GET("health", func(c echo.Context) error {
 		return c.HTML(http.StatusOK, "Health Check OK")
 	})
-	v1.POST("/staff/register", s.baseHandler.RunAction(s.userHandler.Register))
-	v1.POST("/staff/login", s.baseHandler.RunAction(s.userHandler.Login))
+	v1.POST("/user/it/register", s.baseHandler.RunAction(s.userHandler.Register))
+	v1.POST("/user/it/login", s.baseHandler.RunAction(s.userHandler.Login))
 }

@@ -24,7 +24,7 @@ func (h *BaseHTTPHandler) RunAction(fn HandlerFn) echo.HandlerFunc {
 	return h.HandlePanic(h.Execute(fn))
 }
 
-func (h *BaseHTTPHandler) Execute(handler HandlerFn) echo.HandlerFunc {
+func (h *BaseHTTPHandler) Execute(fn HandlerFn) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		defer func() {
 			// return error if err
@@ -52,7 +52,7 @@ func (h *BaseHTTPHandler) Execute(handler HandlerFn) echo.HandlerFunc {
 			}
 		}()
 
-		resp := handler(c)
+		resp := fn(c)
 		httpStatus := resp.Status
 
 		httphelper.WriteJSON(c.Response(), httpStatus,
@@ -70,11 +70,11 @@ func (h *BaseHTTPHandler) HandlePanic(fn echo.HandlerFunc) echo.HandlerFunc {
 		defer func() {
 			if err := recover(); err != nil {
 				h.logPanicMessage(c.Request(), "CaptureLastPanic NEED TO FIX NOW", err)
-				httphelper.WriteJSON(c.Response(), http.StatusInternalServerError, "Request unhalted unxpectedly, Please contact administrator")
+				httphelper.WriteJSON(c.Response(), http.StatusInternalServerError, "Request unhalted unexpectedly, please contact administrator")
 			}
 		}()
-		fn(c)
-		return nil
+		// Call the handler function and return its error if any.
+		return fn(c)
 	}
 }
 

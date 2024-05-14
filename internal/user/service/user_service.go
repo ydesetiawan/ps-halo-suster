@@ -7,51 +7,58 @@ import (
 	"ps-halo-suster/pkg/bcrypt"
 	"ps-halo-suster/pkg/errs"
 	"ps-halo-suster/pkg/middleware"
+	"strconv"
 )
 
-type UserService struct {
+type UserService interface {
+	RegisterUser(*dto.RegisterReq) (*dto.RegisterResp, error)
+	Login(*dto.LoginReq) (*dto.RegisterResp, error)
+}
+
+type userService struct {
 	userRepository repository.UserRepository
 }
 
-func NewUserServiceImpl(userRepository repository.UserRepository) *UserService {
-	return &UserService{
+func NewUserServiceImpl(userRepository repository.UserRepository) UserService {
+	return &userService{
 		userRepository: userRepository,
 	}
 }
 
-func (s *UserService) RegisterUser(req dto.RegisterReq) (*dto.RegisterResp, error) {
-	phoneNumber := req.PhoneNumber
+func (s *userService) RegisterUser(req *dto.RegisterReq) (*dto.RegisterResp, error) {
 	hashedPassword, _ := bcrypt.HashPassword(req.Password)
 	req.Password = hashedPassword
-	id, err := s.userRepository.RegisterUser(model.NewUser(req))
+	req.Role = string(model.IT)
+	id, err := s.userRepository.RegisterUser(model.NewUser(*req))
 
 	if err != nil {
 		return &dto.RegisterResp{}, err
 	}
-	token, _ := middleware.GenerateJWT(phoneNumber, id)
+	token, _ := middleware.GenerateJWT(req.Role, id)
 	return &dto.RegisterResp{
-		PhoneNumber: req.PhoneNumber,
+		UserId:      id,
+		NIP:         req.NIP,
 		Name:        req.Name,
 		AccessToken: token,
 	}, nil
 }
 
-func (s *UserService) Login(req dto.LoginReq) (*dto.RegisterResp, error) {
+func (s *userService) Login(req *dto.LoginReq) (*dto.RegisterResp, error) {
 	//TODO validation request
-	usr, err := s.userRepository.GetUserByPhoneNumber(req.PhoneNumber)
+	usr, err := s.userRepository.GetUserByNIP(strconv.Itoa(req.NIP))
 	if err != nil {
-		return &dto.RegisterResp{}, errs.NewErrDataNotFound("user not found ", req.PhoneNumber, errs.ErrorData{})
+		return &dto.RegisterResp{}, errs.NewErrDataNotFound("user not found ", req.NIP, errs.ErrorData{})
 	}
 	err = bcrypt.ComparePassword(req.Password, usr.Password)
 	if err != nil {
 		return &dto.RegisterResp{}, errs.NewErrBadRequest("password is wrong ")
 	}
 
-	token, _ := middleware.GenerateJWT(usr.PhoneNumber, usr.ID)
+	token, _ := middleware.GenerateJWT(usr.Role, usr.ID)
 
 	return &dto.RegisterResp{
-		PhoneNumber: usr.PhoneNumber,
-		Name:        usr.Name,
+		UserId:      usr.ID,
+		NIP:         usr.NIP,
 		AccessToken: token,
 	}, nil
 }
