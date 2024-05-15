@@ -15,6 +15,7 @@ type UserService interface {
 	GetUserByIdAndRole(id string, role string) (model.User, error)
 	RegisterUser(user *model.User) (*dto.RegisterResp, error)
 	Login(*dto.LoginReq) (*dto.RegisterResp, error)
+	UpdateNurse(user *dto.UpdateUserReq) error
 }
 
 type userService struct {
@@ -36,8 +37,10 @@ func (s *userService) GetUserByIdAndRole(id string, role string) (model.User, er
 }
 
 func (s *userService) RegisterUser(user *model.User) (*dto.RegisterResp, error) {
-	hashedPassword, _ := bcrypt.HashPassword(user.Password)
-	user.Password = hashedPassword
+	if string(model.IT) == user.Role {
+		hashedPassword, _ := bcrypt.HashPassword(user.Password)
+		user.Password = hashedPassword
+	}
 	id, err := s.userRepository.RegisterUser(user)
 
 	if err != nil {
@@ -81,4 +84,8 @@ func (s *userService) Login(req *dto.LoginReq) (*dto.RegisterResp, error) {
 	}
 
 	return response, nil
+}
+
+func (s *userService) UpdateNurse(request *dto.UpdateUserReq) error {
+	return s.userRepository.UpdateUser(request)
 }

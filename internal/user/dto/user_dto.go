@@ -80,3 +80,16 @@ func NewUserNurse(req RegisterNurseReq) *model.User {
 		Role:                string(model.NURSE),
 	}
 }
+
+type UpdateUserReq struct {
+	NIP  int    `json:"nip" validate:"required,validateNipForNurse,validateNip"`
+	Name string `json:"name" validate:"required,min=5,max=50"`
+	ID   string `json:"userId" validate:"required"`
+}
+
+func ValidateUpdateUserReq(req *UpdateUserReq) error {
+	validate := validator.New()
+	validate.RegisterValidation("validateNipForNurse", helper.ValidateNIPForNurse)
+	validate.RegisterValidation("validateNip", helper.ValidateNIP)
+	return validate.Struct(req)
+}
