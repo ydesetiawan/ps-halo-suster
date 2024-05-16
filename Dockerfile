@@ -9,7 +9,7 @@ COPY . .
 
 # Build the Go application
 ENV GOCACHE=/root/.cache/go-build
-RUN --mount=type=cache,target=/root/.cache/go-build go build -o main ./cmd/api
+RUN --mount=type=cache,target=/root/.cache/go-build GOARCH=amd64 GOOS=linux go build -o main ./cmd/api
 
 # Use a minimal base image for the final image
 FROM alpine:latest
