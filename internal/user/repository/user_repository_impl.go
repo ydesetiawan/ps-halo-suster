@@ -206,5 +206,9 @@ func (r *userRepositoryImpl) GetNurses(params *dto.GetNurseParams) ([]dto.GetNur
 		return nil, errs.NewErrInternalServerErrors("execute query error [GetNurses]: ", err.Error())
 	}
 
+	if len(nurses) == 0 {
+		nurses = []dto.GetNurseResp{}
+	}
+
 	return nurses, nil
 }

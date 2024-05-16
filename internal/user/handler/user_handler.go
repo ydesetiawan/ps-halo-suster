@@ -111,9 +111,6 @@ func (h *UserHandler) GetNurses(ctx echo.Context) *response.WebResponse {
 
 	results, err := h.userService.GetNurses(params)
 	helper.PanicIfError(err, "failed to GetNurses")
-	if len(results) == 0 {
-		results = []dto.GetNurseResp{}
-	}
 
 	return &response.WebResponse{
 		Status:  200,
