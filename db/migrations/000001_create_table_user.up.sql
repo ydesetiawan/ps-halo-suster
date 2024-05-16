@@ -8,6 +8,7 @@ CREATE TABLE users (
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE INDEX IF NOT EXISTS idx_user_id ON users (id);
 CREATE INDEX IF NOT EXISTS idx_user_name ON users (name);
 CREATE INDEX IF NOT EXISTS idx_user_nip ON users (nip);
 CREATE INDEX IF NOT EXISTS idx_user_role ON users (role);
