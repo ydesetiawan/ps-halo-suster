@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	imagehandler "ps-halo-suster/internal/image/handler"
+	medicalHandler "ps-halo-suster/internal/medical/handler"
 	userhandler "ps-halo-suster/internal/user/handler"
 	bhandler "ps-halo-suster/pkg/base/handler"
 
@@ -12,25 +13,28 @@ import (
 )
 
 type Server struct {
-	baseHandler  *bhandler.BaseHTTPHandler
-	userHandler  *userhandler.UserHandler
-	imageHandler *imagehandler.ImageHandler
-	echo         *echo.Echo
-	port         int
+	baseHandler    *bhandler.BaseHTTPHandler
+	userHandler    *userhandler.UserHandler
+	medicalHandler *medicalHandler.MedicalHandler
+	imageHandler   *imagehandler.ImageHandler
+	echo           *echo.Echo
+	port           int
 }
 
 func NewServer(
 	bHandler *bhandler.BaseHTTPHandler,
 	userHandler *userhandler.UserHandler,
+	medicalHandler *medicalHandler.MedicalHandler,
 	imageHandler *imagehandler.ImageHandler,
 	port int,
 ) Server {
 	return Server{
-		baseHandler:  bHandler,
-		userHandler:  userHandler,
-		imageHandler: imageHandler,
-		echo:         echo.New(),
-		port:         port,
+		baseHandler:    bHandler,
+		userHandler:    userHandler,
+		medicalHandler: medicalHandler,
+		imageHandler:   imageHandler,
+		echo:           echo.New(),
+		port:           port,
 	}
 }
 
