@@ -13,7 +13,7 @@ type MedicalHandler struct {
 	medicalRecordService  medicalService.MedicalRecordService
 }
 
-func NewUserHandler(userService userService.UserService,
+func NewMedicalHandler(userService userService.UserService,
 	medicalPatientService medicalService.MedicalPatientService,
 	medicalRecordService medicalService.MedicalRecordService) *MedicalHandler {
 	return &MedicalHandler{
