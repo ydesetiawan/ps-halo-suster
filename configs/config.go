@@ -2,47 +2,50 @@ package configs
 
 import (
 	"fmt"
-	"os"
-	"reflect"
+	"ps-halo-suster/pkg/helper"
 	"strings"
 
 	"github.com/joho/godotenv"
+	"github.com/kelseyhightower/envconfig"
 )
 
 type MainConfig struct {
-	Host         string `env:"DB_HOST"`
-	Port         string `env:"DB_PORT"`
-	Username     string `env:"DB_USERNAME"`
-	Password     string `env:"DB_PASSWORD"`
-	DatabaseName string `env:"DB_NAME"`
-	Params       string `env:"DB_PARAMS"`
-}
-
-func (dc *MainConfig) GetDsnString() string {
-	return fmt.Sprintf("postgres://%s:%s@%s:%s/%s?%s", dc.Username, dc.Password, dc.Host, dc.Port, dc.DatabaseName, strings.Replace(dc.Params, "\"", "", -1))
-}
-
-func (mc *MainConfig) ReadConfig() error {
-	v := reflect.ValueOf(mc).Elem()
-	t := v.Type()
-
-	for i := 0; i < v.NumField(); i++ {
-		field := v.Field(i)
-		tag := t.Field(i).Tag.Get("env")
-		if tag != "" {
-			envValue := os.Getenv(tag)
-			if envValue != "" {
-				field.SetString(envValue)
-			}
-		}
+	Database struct {
+		Host         string `envconfig:"DB_HOST"`
+		Port         string `envconfig:"DB_PORT"`
+		Username     string `envconfig:"DB_USERNAME"`
+		Password     string `envconfig:"DB_PASSWORD"`
+		DatabaseName string `envconfig:"DB_NAME"`
+		Params       string `envconfig:"DB_PARAMS"`
 	}
-	return nil
+	S3 struct {
+		ID         string `envconfig:"AWS_ACCESS_KEY_ID"`
+		SecretKey  string `envconfig:"AWS_SECRET_ACCESS_KEY"`
+		BucketName string `envconfig:"AWS_S3_BUCKET_NAME"`
+		Region     string `envconfig:"AWS_REGION"`
+	}
+}
+
+func (mc *MainConfig) GetDsnString() string {
+	dc := mc.Database
+	return fmt.Sprintf(
+		"postgres://%s:%s@%s:%s/%s?%s",
+		dc.Username,
+		dc.Password,
+		dc.Host,
+		dc.Port,
+		dc.DatabaseName,
+		strings.Replace(dc.Params, "\"", "", -1),
+	)
 }
 
 func Init() *MainConfig {
 	godotenv.Load(".env")
 
-	config := &MainConfig{}
-	config.ReadConfig()
-	return config
+	var cfg MainConfig
+	err := envconfig.Process("", &cfg)
+	if err != nil {
+		helper.PanicIfError(err, "Error when reading env config.")
+	}
+	return &cfg
 }

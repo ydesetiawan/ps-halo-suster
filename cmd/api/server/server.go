@@ -2,30 +2,35 @@ package server
 
 import (
 	"fmt"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 	"log/slog"
+	imagehandler "ps-halo-suster/internal/image/handler"
 	userhandler "ps-halo-suster/internal/user/handler"
 	bhandler "ps-halo-suster/pkg/base/handler"
+
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 type Server struct {
-	baseHandler *bhandler.BaseHTTPHandler
-	userHandler *userhandler.UserHandler
-	echo        *echo.Echo
-	port        int
+	baseHandler  *bhandler.BaseHTTPHandler
+	userHandler  *userhandler.UserHandler
+	imageHandler *imagehandler.ImageHandler
+	echo         *echo.Echo
+	port         int
 }
 
 func NewServer(
 	bHandler *bhandler.BaseHTTPHandler,
 	userHandler *userhandler.UserHandler,
+	imageHandler *imagehandler.ImageHandler,
 	port int,
 ) Server {
 	return Server{
-		baseHandler: bHandler,
-		userHandler: userHandler,
-		echo:        echo.New(),
-		port:        port,
+		baseHandler:  bHandler,
+		userHandler:  userHandler,
+		imageHandler: imageHandler,
+		echo:         echo.New(),
+		port:         port,
 	}
 }
 

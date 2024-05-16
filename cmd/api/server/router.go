@@ -1,8 +1,9 @@
 package server
 
 import (
-	"github.com/labstack/echo/v4"
 	"net/http"
+
+	"github.com/labstack/echo/v4"
 )
 
 func (s *Server) setupRouter(e *echo.Echo) {
@@ -20,4 +21,6 @@ func (s *Server) setupRouter(e *echo.Echo) {
 	v1.PUT("/user/nurse/:userId", s.baseHandler.RunActionAuth(s.userHandler.UpdateNurse))
 	v1.DELETE("/user/nurse/:userId", s.baseHandler.RunActionAuth(s.userHandler.DeleteNurse))
 	v1.POST("/user/nurse/:userId/access", s.baseHandler.RunActionAuth(s.userHandler.GrantAccessNurse))
+
+	v1.POST("/image", s.baseHandler.RunActionAuth(s.imageHandler.UploadImage))
 }

@@ -7,6 +7,8 @@ import (
 	"ps-halo-suster/cmd/api/server"
 	"ps-halo-suster/configs"
 
+	imagehandler "ps-halo-suster/internal/image/handler"
+	imageservice "ps-halo-suster/internal/image/service"
 	userhandler "ps-halo-suster/internal/user/handler"
 	userrepository "ps-halo-suster/internal/user/repository"
 	userservice "ps-halo-suster/internal/user/service"
@@ -31,9 +33,11 @@ var httpCmd = &cobra.Command{
 }
 
 var (
-	params      map[string]string
-	baseHandler *bhandler.BaseHTTPHandler
-	userHandler *userhandler.UserHandler
+	params       map[string]string
+	baseHandler  *bhandler.BaseHTTPHandler
+	userHandler  *userhandler.UserHandler
+	imageHandler *imagehandler.ImageHandler
+	cfg          *configs.MainConfig
 )
 
 func init() {
@@ -96,6 +100,7 @@ func runHttpCommand(cmd *cobra.Command, args []string) error {
 	httpServer := server.NewServer(
 		baseHandler,
 		userHandler,
+		imageHandler,
 		port,
 	)
 
@@ -103,14 +108,17 @@ func runHttpCommand(cmd *cobra.Command, args []string) error {
 }
 
 func dbInitConnection() *sqlx.DB {
-	return psqlqgen.Init(configs.Init())
+	return psqlqgen.Init(cfg)
 }
 
 func initInfra() {
+	cfg = configs.Init()
 	db := dbInitConnection()
 
 	userRepository := userrepository.NewUserRepositoryImpl(db)
 	userService := userservice.NewUserServiceImpl(userRepository)
 	userHandler = userhandler.NewUserHandler(userService)
+	imageService := imageservice.NewImageService(cfg)
+	imageHandler = imagehandler.NewImageHandler(imageService)
 
 }
