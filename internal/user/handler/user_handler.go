@@ -102,6 +102,26 @@ func (h *UserHandler) LoginUser(ctx echo.Context, role model.Role) *response.Web
 	}
 }
 
+func (h *UserHandler) GetNurses(ctx echo.Context) *response.WebResponse {
+	err := hasAuthorizeRoleIT(ctx, h)
+	helper.PanicIfError(err, "user unauthorized")
+
+	var params = new(dto.GetNurseParams)
+	err = ctx.Bind(params)
+
+	results, err := h.userService.GetNurses(params)
+	helper.PanicIfError(err, "failed to GetNurses")
+	if len(results) == 0 {
+		results = []dto.GetNurseResp{}
+	}
+
+	return &response.WebResponse{
+		Status:  200,
+		Message: "get nurses successfully",
+		Data:    results,
+	}
+}
+
 func (h *UserHandler) UpdateNurse(ctx echo.Context) *response.WebResponse {
 	err := hasAuthorizeRoleIT(ctx, h)
 	helper.PanicIfError(err, "user unauthorized")

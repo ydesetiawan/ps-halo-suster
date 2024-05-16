@@ -4,6 +4,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"ps-halo-suster/internal/user/model"
 	"ps-halo-suster/pkg/helper"
+	"time"
 )
 
 type LoginReq struct {
@@ -101,4 +102,22 @@ type GrantAccessReq struct {
 func ValidateGrantAccessReq(req *GrantAccessReq) error {
 	validate := validator.New()
 	return validate.Struct(req)
+}
+
+type GetNurseParams struct {
+	UserId    string `query:"userId"`
+	Limit     int    `query:"limit"`
+	Offset    int    `query:"offset"`
+	Name      string `query:"name"`
+	NIP       int    `query:"nip"`
+	Role      string `query:"role"`
+	CreatedAt string `query:"createdAt"`
+}
+
+type GetNurseResp struct {
+	UserId        string    `json:"userId"`
+	NIP           string    `json:"nip"`
+	Name          string    `json:"name"`
+	CreatedAt     string    `json:"createdAt"`
+	CreatedAtTime time.Time `json:"-"`
 }

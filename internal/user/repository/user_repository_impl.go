@@ -1,10 +1,13 @@
 package repository
 
 import (
+	"fmt"
 	"ps-halo-suster/internal/user/dto"
 	"ps-halo-suster/internal/user/model"
 	"ps-halo-suster/pkg/errs"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -132,4 +135,76 @@ func (r *userRepositoryImpl) GrantAccessUser(request *dto.GrantAccessReq) error 
 	}
 
 	return nil
+}
+
+func queryGetNurses(params *dto.GetNurseParams) string {
+	var filters []string
+	if params.UserId != "" {
+		filters = append(filters, fmt.Sprintf("id = '%s'", params.UserId))
+	}
+	if params.Name != "" {
+		filters = append(filters, fmt.Sprintf("LOWER(name) LIKE '%%%s%%'", strings.ToLower(params.Name)))
+	}
+	if params.NIP != 0 {
+		filters = append(filters, fmt.Sprintf("nip LIKE '%%%s%%'", strconv.Itoa(params.NIP)))
+	}
+	if params.Role != "" {
+		if params.Role == "it" {
+			filters = append(filters, "nip LIKE '615%'")
+		} else if params.Role == "nurse" {
+			filters = append(filters, "nip LIKE '303%'")
+		}
+	}
+
+	// Validate createdAt param
+	var orderBy string
+	if params.CreatedAt == "asc" {
+		orderBy = "ORDER BY created_at ASC"
+	} else if params.CreatedAt == "desc" {
+		orderBy = "ORDER BY created_at DESC"
+	}
+
+	// Construct query
+	query := "SELECT id, nip, name, created_at FROM users"
+	if len(filters) > 0 {
+		query += " WHERE " + strings.Join(filters, " AND ")
+	}
+	if orderBy != "" {
+		query += " " + orderBy
+	}
+	if params.Limit == 0 {
+		params.Limit = 5
+	}
+	query += fmt.Sprintf(" LIMIT %d OFFSET %d", params.Limit, params.Offset)
+
+	return query
+}
+
+func (r *userRepositoryImpl) GetNurses(params *dto.GetNurseParams) ([]dto.GetNurseResp, error) {
+	query := queryGetNurses(params)
+	rows, err := r.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var nurses []dto.GetNurseResp
+	for rows.Next() {
+		var nurse dto.GetNurseResp
+		err := rows.Scan(
+			&nurse.UserId,
+			&nurse.NIP,
+			&nurse.Name,
+			&nurse.CreatedAtTime)
+		if err != nil {
+			return nil, errs.NewErrInternalServerErrors("execute query error [GetNurses]: ", err.Error())
+		}
+		nurse.CreatedAt = nurse.CreatedAtTime.Format(time.RFC3339)
+		nurses = append(nurses, nurse)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, errs.NewErrInternalServerErrors("execute query error [GetNurses]: ", err.Error())
+	}
+
+	return nurses, nil
 }

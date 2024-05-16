@@ -15,9 +15,10 @@ type UserService interface {
 	GetUserByIdAndRole(id string, role string) (model.User, error)
 	RegisterUser(user *model.User) (*dto.RegisterResp, error)
 	Login(*dto.LoginReq) (*dto.RegisterResp, error)
-	UpdateNurse(user *dto.UpdateUserReq) error
+	UpdateNurse(request *dto.UpdateUserReq) error
 	DeleteNurse(userId string) error
-	GrantAccessNurse(user *dto.GrantAccessReq) error
+	GrantAccessNurse(request *dto.GrantAccessReq) error
+	GetNurses(params *dto.GetNurseParams) ([]dto.GetNurseResp, error)
 }
 
 type userService struct {
@@ -28,6 +29,10 @@ func NewUserServiceImpl(userRepository repository.UserRepository) UserService {
 	return &userService{
 		userRepository: userRepository,
 	}
+}
+
+func (s *userService) GetNurses(params *dto.GetNurseParams) ([]dto.GetNurseResp, error) {
+	return s.userRepository.GetNurses(params)
 }
 
 func (s *userService) GetUserByIdAndRole(id string, role string) (model.User, error) {

@@ -14,7 +14,7 @@ func (s *Server) setupRouter(e *echo.Echo) {
 	v1.POST("/user/it/register", s.baseHandler.RunAction(s.userHandler.RegisterIT))
 	v1.POST("/user/it/login", s.baseHandler.RunAction(s.userHandler.LoginIT))
 
-	v1.GET("/user", s.baseHandler.RunActionAuth(s.userHandler.RegisterNurse))
+	v1.GET("/user", s.baseHandler.RunActionAuth(s.userHandler.GetNurses))
 
 	v1.POST("/user/nurse/login", s.baseHandler.RunAction(s.userHandler.LoginNurse))
 	v1.POST("/user/nurse/register", s.baseHandler.RunActionAuth(s.userHandler.RegisterNurse))

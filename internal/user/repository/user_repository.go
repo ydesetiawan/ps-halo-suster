@@ -13,4 +13,5 @@ type UserRepository interface {
 	UpdateUser(request *dto.UpdateUserReq) error
 	DeleteUser(userId string) error
 	GrantAccessUser(request *dto.GrantAccessReq) error
+	GetNurses(params *dto.GetNurseParams) ([]dto.GetNurseResp, error)
 }
