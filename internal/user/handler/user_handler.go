@@ -6,8 +6,10 @@ import (
 	"ps-halo-suster/internal/user/model"
 	"ps-halo-suster/internal/user/service"
 	"ps-halo-suster/pkg/base/handler"
+	"ps-halo-suster/pkg/errs"
 	"ps-halo-suster/pkg/helper"
 	"ps-halo-suster/pkg/httphelper/response"
+	"strconv"
 )
 
 type UserHandler struct {
@@ -101,14 +103,19 @@ func (h *UserHandler) LoginUser(ctx echo.Context, role model.Role) *response.Web
 }
 
 func (h *UserHandler) UpdateNurse(ctx echo.Context) *response.WebResponse {
+	err := hasAuthorizeRoleIT(ctx, h)
+	helper.PanicIfError(err, "user unauthorized")
+
 	var request = new(dto.UpdateUserReq)
-	err := ctx.Bind(&request)
+	err = ctx.Bind(&request)
 	request.ID = ctx.Param("userId")
 
 	err = dto.ValidateUpdateUserReq(request)
 	helper.Panic400IfError(err)
-	err = hasAuthorizeRoleIT(ctx, h)
-	helper.PanicIfError(err, "user unauthorized")
+
+	if !helper.ValidatePrefixNurse(strconv.Itoa(request.NIP)) {
+		helper.Panic404IfError(errs.NewErrDataNotFound1(" user is not a nurse (nip not starts with 303)"))
+	}
 
 	err = h.userService.UpdateNurse(request)
 	helper.PanicIfError(err, "failed to UpdateNurse")
@@ -120,9 +127,35 @@ func (h *UserHandler) UpdateNurse(ctx echo.Context) *response.WebResponse {
 }
 
 func (h *UserHandler) DeleteNurse(ctx echo.Context) *response.WebResponse {
-	return h.LoginUser(ctx, model.NURSE)
+	err := hasAuthorizeRoleIT(ctx, h)
+	helper.PanicIfError(err, "user unauthorized")
+
+	nurseId := ctx.Param("userId")
+	err = h.userService.DeleteNurse(nurseId)
+	helper.PanicIfError(err, "failed to DeleteNurse")
+
+	return &response.WebResponse{
+		Status:  200,
+		Message: "User delete successfully",
+	}
 }
 
 func (h *UserHandler) GrantAccessNurse(ctx echo.Context) *response.WebResponse {
-	return h.LoginUser(ctx, model.NURSE)
+	err := hasAuthorizeRoleIT(ctx, h)
+	helper.PanicIfError(err, "user unauthorized")
+
+	var request = new(dto.GrantAccessReq)
+	err = ctx.Bind(&request)
+	request.ID = ctx.Param("userId")
+
+	err = dto.ValidateGrantAccessReq(request)
+	helper.Panic400IfError(err)
+
+	err = h.userService.GrantAccessNurse(request)
+	helper.PanicIfError(err, "failed to UpdateNurse")
+
+	return &response.WebResponse{
+		Status:  200,
+		Message: "User update successfully",
+	}
 }

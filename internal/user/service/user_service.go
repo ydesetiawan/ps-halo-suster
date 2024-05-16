@@ -16,6 +16,8 @@ type UserService interface {
 	RegisterUser(user *model.User) (*dto.RegisterResp, error)
 	Login(*dto.LoginReq) (*dto.RegisterResp, error)
 	UpdateNurse(user *dto.UpdateUserReq) error
+	DeleteNurse(userId string) error
+	GrantAccessNurse(user *dto.GrantAccessReq) error
 }
 
 type userService struct {
@@ -88,4 +90,14 @@ func (s *userService) Login(req *dto.LoginReq) (*dto.RegisterResp, error) {
 
 func (s *userService) UpdateNurse(request *dto.UpdateUserReq) error {
 	return s.userRepository.UpdateUser(request)
+}
+
+func (s *userService) DeleteNurse(userId string) error {
+	return s.userRepository.DeleteUser(userId)
+}
+
+func (s *userService) GrantAccessNurse(request *dto.GrantAccessReq) error {
+	hashedPassword, _ := bcrypt.HashPassword(request.Password)
+	request.Password = hashedPassword
+	return s.userRepository.GrantAccessUser(request)
 }

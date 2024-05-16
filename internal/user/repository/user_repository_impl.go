@@ -87,3 +87,49 @@ func (r *userRepositoryImpl) UpdateUser(request *dto.UpdateUserReq) error {
 
 	return nil
 }
+
+const queryDeleteUser = `
+    WITH deleted AS (
+        DELETE FROM users
+        WHERE id = $1
+        RETURNING *
+    )
+    SELECT EXISTS(SELECT 1 FROM deleted)
+    `
+
+func (r *userRepositoryImpl) DeleteUser(userId string) error {
+	var exists bool
+	err := r.db.Get(&exists, queryDeleteUser, userId)
+	if err != nil {
+		return errs.NewErrDataConflict("execute query error [DeleteUser]: ", err.Error())
+	}
+
+	if !exists {
+		return errs.NewErrDataNotFound("user not found ", userId, errs.ErrorData{})
+	}
+	return nil
+}
+
+const queryGrantAccessUser = `
+    WITH updated AS (
+        UPDATE users
+        SET password = $1
+        WHERE id = $2
+        RETURNING *
+    )
+    SELECT EXISTS(SELECT 1 FROM updated)
+    `
+
+func (r *userRepositoryImpl) GrantAccessUser(request *dto.GrantAccessReq) error {
+	var exists bool
+	err := r.db.Get(&exists, queryGrantAccessUser, request.Password, request.ID)
+	if err != nil {
+		return errs.NewErrDataConflict("execute query error [GrantAccess]: ", err.Error())
+	}
+
+	if !exists {
+		return errs.NewErrDataNotFound("user not found ", request.ID, errs.ErrorData{})
+	}
+
+	return nil
+}

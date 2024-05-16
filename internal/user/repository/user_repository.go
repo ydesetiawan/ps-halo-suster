@@ -11,4 +11,6 @@ type UserRepository interface {
 	GetUserByNIPAndId(nip string, id string) (model.User, error)
 	RegisterUser(user *model.User) (string, error)
 	UpdateUser(request *dto.UpdateUserReq) error
+	DeleteUser(userId string) error
+	GrantAccessUser(request *dto.GrantAccessReq) error
 }

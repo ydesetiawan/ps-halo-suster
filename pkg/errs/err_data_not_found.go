@@ -14,6 +14,18 @@ func (e ErrDataNotFound) Error() string {
 	return fmt.Sprintf("%s. data_id: %v", e.msg, e.DataId)
 }
 
+func NewErrDataNotFound1(msg string) ErrDataNotFound {
+	return ErrDataNotFound{
+		ErrBase: ErrBase{
+			msg:           msg,
+			ErrorData:     ErrorData{},
+			StatusCode:    http.StatusNotFound,
+			StatusMessage: http.StatusText(http.StatusNotFound),
+		},
+		DataId: nil,
+	}
+}
+
 func NewErrDataNotFound(msg string, dataId any, errData ErrorData) ErrDataNotFound {
 	return ErrDataNotFound{
 		ErrBase: ErrBase{
