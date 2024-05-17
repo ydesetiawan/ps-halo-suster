@@ -11,7 +11,7 @@ migration_setup:
 	psql -U ${DB_USERNAME} -c "CREATE DATABASE ${DB_NAME};"
 
 migration_up:
-	migrate -path db/migrations/ -database "postgresql://${DB_USERNAME}:@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable" -verbose up
+	migrate -path db/migrations/ -database "postgresql://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable" -verbose up
 
 migration_down:
 	@read -p "Enter VERSION: " VERSION; \
