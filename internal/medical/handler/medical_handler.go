@@ -2,20 +2,21 @@ package handler
 
 import (
 	"github.com/labstack/echo/v4"
-	medicalService "ps-halo-suster/internal/medical/service"
+	medicalPatientService "ps-halo-suster/internal/medical/patient/service"
+	medicalRecordService "ps-halo-suster/internal/medical/record/service"
 	userService "ps-halo-suster/internal/user/service"
 	"ps-halo-suster/pkg/httphelper/response"
 )
 
 type MedicalHandler struct {
 	userService           userService.UserService
-	medicalPatientService medicalService.MedicalPatientService
-	medicalRecordService  medicalService.MedicalRecordService
+	medicalPatientService medicalPatientService.MedicalPatientService
+	medicalRecordService  medicalRecordService.MedicalRecordService
 }
 
 func NewMedicalHandler(userService userService.UserService,
-	medicalPatientService medicalService.MedicalPatientService,
-	medicalRecordService medicalService.MedicalRecordService) *MedicalHandler {
+	medicalPatientService medicalPatientService.MedicalPatientService,
+	medicalRecordService medicalRecordService.MedicalRecordService) *MedicalHandler {
 	return &MedicalHandler{
 		userService:           userService,
 		medicalPatientService: medicalPatientService,

@@ -1,8 +1,9 @@
 package service
 
 import (
-	"ps-halo-suster/internal/medical/dto"
-	medicalRepository "ps-halo-suster/internal/medical/repository"
+	patientRepository "ps-halo-suster/internal/medical/patient/repository"
+	"ps-halo-suster/internal/medical/record/dto"
+	"ps-halo-suster/internal/medical/record/repository"
 	userRepository "ps-halo-suster/internal/user/repository"
 )
 
@@ -13,13 +14,13 @@ type MedicalRecordService interface {
 
 type medicalRecordService struct {
 	userRepository           userRepository.UserRepository
-	medicalPatientRepository medicalRepository.MedicalPatientRepository
-	medicalRecordRepository  medicalRepository.MedicalRecordRepository
+	medicalPatientRepository patientRepository.MedicalPatientRepository
+	medicalRecordRepository  repository.MedicalRecordRepository
 }
 
 func NewMedicalRecordServiceImpl(userRepository userRepository.UserRepository,
-	medicalPatientRepository medicalRepository.MedicalPatientRepository,
-	medicalRecordRepository medicalRepository.MedicalRecordRepository) MedicalRecordService {
+	medicalPatientRepository patientRepository.MedicalPatientRepository,
+	medicalRecordRepository repository.MedicalRecordRepository) MedicalRecordService {
 	return &medicalRecordService{
 		userRepository:           userRepository,
 		medicalPatientRepository: medicalPatientRepository,

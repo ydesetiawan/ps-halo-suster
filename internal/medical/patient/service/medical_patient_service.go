@@ -1,9 +1,9 @@
 package service
 
 import (
-	"ps-halo-suster/internal/medical/dto"
-	"ps-halo-suster/internal/medical/model"
-	medicalRepository "ps-halo-suster/internal/medical/repository"
+	"ps-halo-suster/internal/medical/patient/dto"
+	"ps-halo-suster/internal/medical/patient/model"
+	medicalRepository "ps-halo-suster/internal/medical/patient/repository"
 )
 
 type MedicalPatientService interface {

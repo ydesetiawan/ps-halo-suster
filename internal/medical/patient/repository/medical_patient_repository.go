@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"ps-halo-suster/internal/medical/dto"
-	"ps-halo-suster/internal/medical/model"
+	"ps-halo-suster/internal/medical/patient/dto"
+	"ps-halo-suster/internal/medical/patient/model"
 )
 
 type MedicalPatientRepository interface {

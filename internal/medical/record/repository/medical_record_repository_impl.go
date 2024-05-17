@@ -3,7 +3,7 @@ package repository
 import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
-	"ps-halo-suster/internal/medical/dto"
+	"ps-halo-suster/internal/medical/record/dto"
 	"strings"
 )
 

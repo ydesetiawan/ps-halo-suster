@@ -2,8 +2,8 @@ package repository
 
 import (
 	"github.com/jmoiron/sqlx"
-	"ps-halo-suster/internal/medical/dto"
-	"ps-halo-suster/internal/medical/model"
+	"ps-halo-suster/internal/medical/patient/dto"
+	"ps-halo-suster/internal/medical/patient/model"
 )
 
 type medicalPatientRepository struct {
