@@ -1,11 +1,14 @@
 package service
 
 import (
+	"ps-halo-suster/internal/medical/dto"
 	medicalRepository "ps-halo-suster/internal/medical/repository"
 	userRepository "ps-halo-suster/internal/user/repository"
 )
 
 type MedicalRecordService interface {
+	CreateRecord(request dto.MedicalRecordReq) error
+	GetRecords(params dto.MedicalRecordReqParams) ([]dto.MedicalRecordResp, error)
 }
 
 type medicalRecordService struct {
@@ -22,4 +25,14 @@ func NewMedicalRecordServiceImpl(userRepository userRepository.UserRepository,
 		medicalPatientRepository: medicalPatientRepository,
 		medicalRecordRepository:  medicalRecordRepository,
 	}
+}
+
+func (m medicalRecordService) CreateRecord(request dto.MedicalRecordReq) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m medicalRecordService) GetRecords(params dto.MedicalRecordReqParams) ([]dto.MedicalRecordResp, error) {
+	//TODO implement me
+	panic("implement me")
 }
