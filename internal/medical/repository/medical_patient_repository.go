@@ -6,6 +6,6 @@ import (
 )
 
 type MedicalPatientRepository interface {
-	CreatePatient(request dto.MedicalPatientReq) error
-	GetPatients(params dto.MedicalPatientReqParams) ([]model.MedicalPatient, error)
+	CreatePatient(request *dto.MedicalPatientReq) error
+	GetPatients(params *dto.MedicalPatientReqParams) ([]model.MedicalPatient, error)
 }

@@ -15,13 +15,13 @@ func NewMedicalRecordRepositoryImpl(db *sqlx.DB) MedicalRecordRepository {
 	return &medicalRecordRepository{db: db}
 }
 
-func (m *medicalRecordRepository) CreateRecord(request dto.MedicalRecordReq) error {
+func (m *medicalRecordRepository) CreateRecord(request *dto.MedicalRecordReq) error {
 	//TODO implement me
 	panic("implement me")
 }
 
 // TODO need to testing
-func queryGetRecords(params dto.MedicalRecordReqParams) string {
+func queryGetRecords(params *dto.MedicalRecordReqParams) string {
 	var filters []string
 
 	// Add conditions based on the parameters
@@ -60,7 +60,7 @@ func queryGetRecords(params dto.MedicalRecordReqParams) string {
 	return query
 }
 
-func (m *medicalRecordRepository) GetRecords(params dto.MedicalRecordReqParams) ([]dto.MedicalRecordResp, error) {
+func (m *medicalRecordRepository) GetRecords(params *dto.MedicalRecordReqParams) ([]dto.MedicalRecordResp, error) {
 	query := queryGetRecords(params)
 	rows, err := m.db.Query(query)
 	if err != nil {

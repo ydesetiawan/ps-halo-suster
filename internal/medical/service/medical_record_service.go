@@ -7,8 +7,8 @@ import (
 )
 
 type MedicalRecordService interface {
-	CreateRecord(request dto.MedicalRecordReq) error
-	GetRecords(params dto.MedicalRecordReqParams) ([]dto.MedicalRecordResp, error)
+	CreateRecord(request *dto.MedicalRecordReq) error
+	GetRecords(params *dto.MedicalRecordReqParams) ([]dto.MedicalRecordResp, error)
 }
 
 type medicalRecordService struct {
@@ -27,12 +27,11 @@ func NewMedicalRecordServiceImpl(userRepository userRepository.UserRepository,
 	}
 }
 
-func (m medicalRecordService) CreateRecord(request dto.MedicalRecordReq) error {
+func (m *medicalRecordService) CreateRecord(request *dto.MedicalRecordReq) error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (m medicalRecordService) GetRecords(params dto.MedicalRecordReqParams) ([]dto.MedicalRecordResp, error) {
-	//TODO implement me
-	panic("implement me")
+func (m *medicalRecordService) GetRecords(params *dto.MedicalRecordReqParams) ([]dto.MedicalRecordResp, error) {
+	return m.medicalRecordRepository.GetRecords(params)
 }
