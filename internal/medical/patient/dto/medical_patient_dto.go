@@ -10,10 +10,10 @@ type MedicalPatientReq struct {
 }
 
 type MedicalPatientReqParams struct {
-	IdentityNumber *int    `query:"identityNumber"`
-	Limit          int     `query:"limit"`
-	Offset         int     `query:"offset"`
-	Name           *string `query:"name"`
-	PhoneNumber    *string `query:"phoneNumber"`
-	CreatedAt      *string `query:"createdAt"`
+	IdentityNumber int    `query:"identityNumber"`
+	Limit          int    `query:"limit"`
+	Offset         int    `query:"offset"`
+	Name           string `query:"name"`
+	PhoneNumber    string `query:"phoneNumber"`
+	CreatedAt      string `query:"createdAt"`
 }

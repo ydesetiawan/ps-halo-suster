@@ -21,7 +21,7 @@ func (m *medicalRecordRepository) CreateRecord(request *dto.MedicalRecordReq) er
 }
 
 // TODO need to testing
-func queryGetRecords(params *dto.MedicalRecordReqParams) string {
+func buildMedicalRecordQuery(params *dto.MedicalRecordReqParams) string {
 	var filters []string
 
 	// Add conditions based on the parameters
@@ -61,7 +61,7 @@ func queryGetRecords(params *dto.MedicalRecordReqParams) string {
 }
 
 func (m *medicalRecordRepository) GetRecords(params *dto.MedicalRecordReqParams) ([]dto.MedicalRecordResp, error) {
-	query := queryGetRecords(params)
+	query := buildMedicalRecordQuery(params)
 	rows, err := m.db.Query(query)
 	if err != nil {
 		return nil, err
