@@ -9,6 +9,10 @@ import (
 	imagehandler "ps-halo-suster/internal/image/handler"
 	imageservice "ps-halo-suster/internal/image/service"
 	medicalhandler "ps-halo-suster/internal/medical/handler"
+	patientrepository "ps-halo-suster/internal/medical/patient/repository"
+	patientservice "ps-halo-suster/internal/medical/patient/service"
+	recordrepository "ps-halo-suster/internal/medical/record/repository"
+	recordservice "ps-halo-suster/internal/medical/record/service"
 	userhandler "ps-halo-suster/internal/user/handler"
 	userrepository "ps-halo-suster/internal/user/repository"
 	userservice "ps-halo-suster/internal/user/service"
@@ -122,5 +126,11 @@ func initInfra() {
 	userHandler = userhandler.NewUserHandler(userService)
 	imageService := imageservice.NewImageService(cfg)
 	imageHandler = imagehandler.NewImageHandler(imageService)
+
+	patientRepository := patientrepository.NewMedicalPatientRepositoryImpl(db)
+	recordRepository := recordrepository.NewMedicalRecordRepositoryImpl(db)
+	patientService := patientservice.NewMedicalPatientServiceImpl(patientRepository)
+	recordService := recordservice.NewMedicalRecordServiceImpl(userRepository, patientRepository, recordRepository)
+	medicalHandler = medicalhandler.NewMedicalHandler(userService, patientService, recordService)
 
 }
