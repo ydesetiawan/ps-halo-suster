@@ -17,13 +17,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: List directory contents
+        run: ls -la
+
       - name: DB Migration Up
         env:
           DB_USERNAME: ${{ secrets.DB_USERNAME }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_HOST: ${{ secrets.DB_HOST }}
-          DB_PORT: ${{ env.DB_PORT }}
-          DB_NAME: ${{ env.DB_NAME }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+          DB_NAME: ${{ secrets.DB_NAME }}
         run: make migration_up
 
       - name: Checkout code
