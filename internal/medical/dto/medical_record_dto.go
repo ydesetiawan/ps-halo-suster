@@ -33,12 +33,12 @@ type MedicalRecordResp struct {
 }
 
 type IdentityDetailParams struct {
-	IdentityNumber *int `query:"identityNumber"`
+	IdentityNumber int `query:"identityNumber"`
 }
 
 type CreatedByParams struct {
-	UserID *string `query:"userId"`
-	NIP    *string `query:"nip"`
+	UserID string `query:"userId"`
+	NIP    string `query:"nip"`
 }
 
 type MedicalRecordReqParams struct {
@@ -46,5 +46,5 @@ type MedicalRecordReqParams struct {
 	CreatedBy      CreatedByParams      `query:"createdBy"`
 	Limit          int                  `query:"limit"`
 	Offset         int                  `query:"offset"`
-	CreatedAt      *string              `query:"createdAt"`
+	CreatedAt      string               `query:"createdAt"`
 }
