@@ -131,6 +131,6 @@ func initInfra() {
 	recordRepository := recordrepository.NewMedicalRecordRepositoryImpl(db)
 	patientService := patientservice.NewMedicalPatientServiceImpl(patientRepository)
 	recordService := recordservice.NewMedicalRecordServiceImpl(userRepository, patientRepository, recordRepository)
-	medicalHandler = medicalhandler.NewMedicalHandler(userService, patientService, recordService)
+	medicalHandler = medicalhandler.NewMedicalHandler(patientService, recordService)
 
 }

@@ -1,5 +1,9 @@
 package dto
 
+import (
+	"github.com/go-playground/validator/v10"
+)
+
 type MedicalPatientReq struct {
 	IdentityNumber      string `json:"identityNumber" validate:"required,len=16,numeric"`
 	PhoneNumber         string `json:"phoneNumber" validate:"required,min=10,max=15,startswith=+62"`
@@ -7,6 +11,12 @@ type MedicalPatientReq struct {
 	BirthDate           string `json:"birthDate" validate:"required,datetime=2006-01-02"`
 	Gender              string `json:"gender" validate:"required,oneof=male female"`
 	IdentityCardScanImg string `json:"identityCardScanImg" validate:"required,url"`
+}
+
+func ValidateMedicalPatientReq(req *MedicalPatientReq) error {
+	validate := validator.New()
+	//TODO add validation phone number
+	return validate.Struct(req)
 }
 
 type MedicalPatientReqParams struct {

@@ -1,11 +1,19 @@
 package dto
 
-import "time"
+import (
+	"github.com/go-playground/validator/v10"
+	"time"
+)
 
 type MedicalRecordReq struct {
 	IdentityNumber string `json:"identityNumber" validate:"required,len=16,numeric"`
 	Symptoms       string `json:"symptoms" validate:"required,min=1,max=2000"`
 	Medications    string `json:"medications" validate:"required,min=1,max=2000"`
+}
+
+func ValidateMedicalRecordReq(req *MedicalRecordReq) error {
+	validate := validator.New()
+	return validate.Struct(req)
 }
 
 type IdentityDetail struct {
