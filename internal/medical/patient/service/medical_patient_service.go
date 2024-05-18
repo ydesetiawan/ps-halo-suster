@@ -7,7 +7,7 @@ import (
 )
 
 type MedicalPatientService interface {
-	CreatePatient(request *dto.MedicalPatientReq) error
+	CreatePatient(request *dto.MedicalPatientReq) (model.MedicalPatient, error)
 	GetPatients(params *dto.MedicalPatientReqParams) ([]model.MedicalPatient, error)
 }
 
@@ -22,9 +22,16 @@ func NewMedicalPatientServiceImpl(
 	}
 }
 
-func (m *medicalPatientService) CreatePatient(request *dto.MedicalPatientReq) error {
-	//TODO implement me
-	panic("implement me")
+func (m *medicalPatientService) CreatePatient(request *dto.MedicalPatientReq) (model.MedicalPatient, error) {
+  medicalPatientReq := dto.NewMedicalPatient(*request)
+
+	medicalPatient, err := m.medicalPatientRepository.CreatePatient(*medicalPatientReq)
+
+  if err != nil {
+    return medicalPatient, err;
+  }
+
+  return medicalPatient, nil
 }
 
 func (m *medicalPatientService) GetPatients(params *dto.MedicalPatientReqParams) ([]model.MedicalPatient, error) {

@@ -1,10 +1,11 @@
 package dto
 
 import (
-	"github.com/go-playground/validator/v10"
 	"ps-halo-suster/internal/user/model"
 	"ps-halo-suster/pkg/helper"
 	"time"
+
+	"github.com/go-playground/validator/v10"
 )
 
 type LoginReq struct {
@@ -20,7 +21,7 @@ func ValidateLoginReq(loginReq *LoginReq) error {
 }
 
 type RegisterITReq struct {
-	NIP      int    `json:"nip" validate:"required,validateNipForIT,validateNip"`
+	NIP      int    `json:"nip" validate:"validateNipForIT,validateNip"`
 	Name     string `json:"name" validate:"required,min=5,max=50"`
 	Password string `json:"password" validate:"required,min=5,max=15"`
 	Role     string `json:"-"`
