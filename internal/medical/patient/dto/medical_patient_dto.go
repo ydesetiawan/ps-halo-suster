@@ -46,3 +46,13 @@ func NewMedicalPatient(req MedicalPatientReq) *model.MedicalPatient {
 		IdentityCardScanImg: req.IdentityCardScanImg,
 	}
 }
+
+type MedicalPatientResp struct {
+  IdentityNumber      int    `json:"identityNumber"`
+  Name                string `json:"name"`
+  PhoneNumber         string `json:"phoneNumber"`
+  BirthDate           string `json:"birthDate"`
+  Gender              string `json:"gender"`
+  IdentityCardScanImg string `json:"identityCardScanImg"`
+  CreatedAt           string `json:"createdAt"`
+}

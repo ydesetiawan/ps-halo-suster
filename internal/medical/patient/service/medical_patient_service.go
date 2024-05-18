@@ -8,7 +8,7 @@ import (
 
 type MedicalPatientService interface {
 	CreatePatient(request *dto.MedicalPatientReq) (model.MedicalPatient, error)
-	GetPatients(params *dto.MedicalPatientReqParams) ([]model.MedicalPatient, error)
+	GetPatients(params *dto.MedicalPatientReqParams) ([]dto.MedicalPatientResp, error)
 }
 
 type medicalPatientService struct {
@@ -34,6 +34,6 @@ func (m *medicalPatientService) CreatePatient(request *dto.MedicalPatientReq) (m
   return medicalPatient, nil
 }
 
-func (m *medicalPatientService) GetPatients(params *dto.MedicalPatientReqParams) ([]model.MedicalPatient, error) {
+func (m *medicalPatientService) GetPatients(params *dto.MedicalPatientReqParams) ([]dto.MedicalPatientResp, error) {
 	return m.medicalPatientRepository.GetPatients(params)
 }

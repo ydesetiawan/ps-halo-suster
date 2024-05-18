@@ -78,15 +78,45 @@ func buildMedicalPatientQuery(params *dto.MedicalPatientReqParams) string {
 	return query
 }
 
-func (m *medicalPatientRepositoryImpl) GetPatients(params *dto.MedicalPatientReqParams) ([]model.MedicalPatient, error) {
+func (m *medicalPatientRepositoryImpl) GetPatients(params *dto.MedicalPatientReqParams) ([]dto.MedicalPatientResp, error) {
 	query := buildMedicalPatientQuery(params)
 	rows, err := m.db.Query(query)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	//TODO
+	
+  var medicalPatients []dto.MedicalPatientResp
 
-	return nil, nil
+  for rows.Next() {
+    var medicalPatient dto.MedicalPatientResp
+
+    err := rows.Scan(
+      &medicalPatient.IdentityNumber,
+      &medicalPatient.Name,
+      &medicalPatient.PhoneNumber,
+      &medicalPatient.BirthDate,
+      &medicalPatient.Gender,
+      &medicalPatient.IdentityCardScanImg,
+      &medicalPatient.CreatedAt,
+    )
+    
+    if err != nil {
+      return nil, errs.NewErrInternalServerErrors("execute query error [GetNurses]: ", err.Error())
+    }
+
+    // medicalPatient.CreatedAt = medicalPatient.CreatedAt.Format(time.RFC3339)
+    medicalPatients = append(medicalPatients, medicalPatient)
+  }
+
+  if err := rows.Err(); err != nil {
+    return nil, errs.NewErrInternalServerErrors("execute query error [GetNurses]: ", err.Error())
+  }
+
+  if len(medicalPatients) == 0 {
+    medicalPatients = []dto.MedicalPatientResp{}
+  }
+
+	return medicalPatients, nil
 
 }

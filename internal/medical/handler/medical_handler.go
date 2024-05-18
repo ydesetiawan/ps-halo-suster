@@ -52,7 +52,7 @@ func (h *MedicalHandler) GetMedicalPatient(ctx echo.Context) *response.WebRespon
 
 	return &response.WebResponse{
 		Status:  200,
-		Message: "GetMedicalPatient Successfully",
+		Message: "success",
 		Data:    results,
 	}
 }
