@@ -70,29 +70,29 @@ func ValidateNIP(fl validator.FieldLevel) bool {
 	nipInt := fl.Field().Int()
 	nip := strconv.Itoa(int(nipInt))
 
-	// Check the fourth digit for gender
+	return ValidateNIPFromStr(nip)
+}
+
+func ValidateNIPFromStr(nip string) bool {
 	genderDigit := nip[3]
 	if genderDigit != '1' && genderDigit != '2' {
 		return false
 	}
 
-	// Check the year part (fifth and sixth digits)
-	yearStr := nip[4:6]
+	yearStr := nip[4:8]
 	year, err := strconv.Atoi(yearStr)
-	if err != nil || year < 0 || year > (time.Now().Year()%100) {
+	if err != nil || year < 2000 || year > (time.Now().Year()) {
 		return false
 	}
 
-	// Check the month part (seventh and eighth digits)
-	monthStr := nip[6:8]
+	monthStr := nip[8:10]
 	month, err := strconv.Atoi(monthStr)
 	if err != nil || month < 1 || month > 12 {
 		return false
 	}
 
-	// Check the random digits part (ninth to thirteenth digits)
-	randomDigits := nip[8:]
-	if len(randomDigits) < 3 || len(randomDigits) > 7 {
+	randomDigits := nip[10:]
+	if len(randomDigits) < 3 || len(randomDigits) > 5 {
 		return false
 	}
 	if _, err := strconv.Atoi(randomDigits); err != nil {
