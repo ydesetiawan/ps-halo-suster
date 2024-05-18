@@ -9,7 +9,7 @@ func TestValidateNIPFromStr(t *testing.T) {
 		nip    string
 		result bool
 	}{
-		{"303220200633752", true},       // Valid NIP
+		{"303120200982140", true},       // Valid NIP
 		{"615320220100001", false},      // Invalid gender digit
 		{"615219990213000", false},      // Invalid year
 		{"615220121302013", false},      // Invalid month
