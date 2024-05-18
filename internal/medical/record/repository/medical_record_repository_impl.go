@@ -7,6 +7,7 @@ import (
 	"ps-halo-suster/internal/medical/record/model"
 	"ps-halo-suster/pkg/errs"
 	"strings"
+	"time"
 )
 
 type medicalRecordRepository struct {
@@ -47,32 +48,49 @@ func (m *medicalRecordRepository) CreateRecord(mRecord *model.MedicalRecord) err
 	return nil
 }
 
-// TODO need to testing
 func buildMedicalRecordQuery(params *dto.MedicalRecordReqParams) string {
 	var filters []string
 
 	// Add conditions based on the parameters
-	if params.IdentityDetail.IdentityNumber != 0 {
-		filters = append(filters, fmt.Sprintf("identity_number = %d", params.IdentityDetail.IdentityNumber))
+	if params.IdentityNumber != 0 {
+		filters = append(filters, fmt.Sprintf("mr.identity_number = %d", params.IdentityNumber))
 	}
-	if params.CreatedBy.UserID != "" {
-		filters = append(filters, fmt.Sprintf("users.id = '%s'", params.CreatedBy.UserID))
+	if params.UserID != "" {
+		filters = append(filters, fmt.Sprintf("uc.id = '%s'", params.UserID))
 	}
-	if params.CreatedBy.NIP != "" {
-		filters = append(filters, fmt.Sprintf("users.nip = '%s'", params.CreatedBy.NIP))
+	if params.NIP != "" {
+		filters = append(filters, fmt.Sprintf("uc.nip = '%s'", params.NIP))
 	}
 
 	// Validate createdAt param
 	var orderBy string
 	if params.CreatedAt == "asc" {
-		orderBy = "ORDER BY medical_records.created_at ASC"
-	} else if params.CreatedAt == "desc" {
-		orderBy = "ORDER BY medical_records.created_at DESC"
+		orderBy = "ORDER BY mr.created_at ASC"
+	} else if params.CreatedAt == "desc" || params.CreatedAt == "" {
+		orderBy = "ORDER BY mr.created_at DESC"
 	}
 
-	// Construct query
-	query := "SELECT medical_records.id, medical_records.identity_number, medical_records.symptoms, medical_records.medications, medical_records.created_at FROM medical_records"
-	query += " JOIN users ON medical_records.created_by = users.id"
+	// Construct query using CTE
+	query := `
+		WITH user_check AS (
+			SELECT id, nip, name
+			FROM users
+			WHERE 1 = 1`
+	if params.UserID != "" {
+		query += fmt.Sprintf(" AND id = '%s'", params.UserID)
+	}
+	if params.NIP != "" {
+		query += fmt.Sprintf(" AND nip = '%s'", params.NIP)
+	}
+	query += `
+		)
+		SELECT mr.identity_number, mr.symptoms, mr.medications, mr.created_at, 
+		       uc.nip, uc.name AS user_name, uc.id AS user_id,
+		       mp.phone_number, mp.name, mp.birth_date, mp.gender, mp.identity_card_scan_img
+		FROM medical_records mr
+		JOIN user_check uc ON mr.created_by = uc.id
+		JOIN medical_patients mp ON mr.identity_number = mp.identity_number`
+
 	if len(filters) > 0 {
 		query += " WHERE " + strings.Join(filters, " AND ")
 	}
@@ -94,7 +112,34 @@ func (m *medicalRecordRepository) GetRecords(params *dto.MedicalRecordReqParams)
 		return nil, err
 	}
 	defer rows.Close()
-	//TODO
 
-	return nil, nil
+	var records []dto.MedicalRecordResp
+	for rows.Next() {
+		var record dto.MedicalRecordResp
+		var createdAt time.Time
+		err := rows.Scan(
+			&record.IdentityDetail.IdentityNumber,
+			&record.Symptoms,
+			&record.Medications,
+			&createdAt,
+			&record.CreatedBy.NIP,
+			&record.CreatedBy.Name,
+			&record.CreatedBy.UserID,
+			&record.IdentityDetail.PhoneNumber,
+			&record.IdentityDetail.Name,
+			&record.IdentityDetail.BirthDate,
+			&record.IdentityDetail.Gender,
+			&record.IdentityDetail.IdentityCardScanImg,
+		)
+		if err != nil {
+			return nil, err
+		}
+		record.CreatedAt = createdAt.Format(time.RFC3339)
+		records = append(records, record)
+	}
+	if len(records) == 0 {
+		records = []dto.MedicalRecordResp{}
+	}
+
+	return records, nil
 }
