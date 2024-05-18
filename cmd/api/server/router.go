@@ -22,10 +22,10 @@ func (s *Server) setupRouter(e *echo.Echo) {
 	v1.DELETE("/user/nurse/:userId", s.baseHandler.RunActionAuth(s.userHandler.DeleteNurse))
 	v1.POST("/user/nurse/:userId/access", s.baseHandler.RunActionAuth(s.userHandler.GrantAccessNurse))
 
-	v1.POST("/user/medical/patient", s.baseHandler.RunActionAuth(s.medicalHandler.CreateMedicalPatient))
-	v1.GET("/user/medical/patient", s.baseHandler.RunActionAuth(s.medicalHandler.GetMedicalPatient))
-	v1.POST("/user/medical/record", s.baseHandler.RunActionAuth(s.medicalHandler.CreateRecordPatient))
-	v1.GET("/user/medical/record", s.baseHandler.RunActionAuth(s.medicalHandler.GetRecordPatient))
+	v1.POST("/medical/patient", s.baseHandler.RunActionAuth(s.medicalHandler.CreateMedicalPatient))
+	v1.GET("/medical/patient", s.baseHandler.RunActionAuth(s.medicalHandler.GetMedicalPatient))
+	v1.POST("/medical/record", s.baseHandler.RunActionAuth(s.medicalHandler.CreateRecordPatient))
+	v1.GET("/medical/record", s.baseHandler.RunActionAuth(s.medicalHandler.GetRecordPatient))
 
 	v1.POST("/image", s.baseHandler.RunActionAuth(s.imageHandler.UploadImage))
 }

@@ -2,23 +2,42 @@ package repository
 
 import (
 	"fmt"
-	"github.com/jmoiron/sqlx"
 	"ps-halo-suster/internal/medical/patient/dto"
 	"ps-halo-suster/internal/medical/patient/model"
+	"ps-halo-suster/pkg/errs"
 	"strings"
+
+	"github.com/jmoiron/sqlx"
 )
 
-type medicalPatientRepository struct {
+type medicalPatientRepositoryImpl struct {
 	db *sqlx.DB
 }
 
 func NewMedicalPatientRepositoryImpl(db *sqlx.DB) MedicalPatientRepository {
-	return &medicalPatientRepository{db: db}
+	return &medicalPatientRepositoryImpl{db: db}
 }
 
-func (m *medicalPatientRepository) CreatePatient(request *dto.MedicalPatientReq) error {
-	//TODO implement me
-	panic("implement me")
+func (r *medicalPatientRepositoryImpl) CreatePatient(medicalPatient model.MedicalPatient) (model.MedicalPatient, error) {
+  query := `INSERT INTO medical_patients (identity_number, name, phone_number, birth_date, gender, identity_card_scan_img) VALUES ($1, $2, $3, $4, $5, $6)`
+	_, err := r.db.Exec(
+    query, 
+    medicalPatient.IdentityNumber, 
+    medicalPatient.Name, 
+    medicalPatient.PhoneNumber, 
+    medicalPatient.BirthDate, 
+    medicalPatient.Gender, 
+    medicalPatient.IdentityCardScanImg)
+	
+  if err != nil {
+    if strings.Contains(err.Error(), "medical_patients_pkey") {
+      return medicalPatient, errs.NewErrDataConflict("identity number already exists", medicalPatient.IdentityNumber)
+    }
+
+		return medicalPatient, errs.NewErrInternalServerErrors("execute query error [RegisterUser]: ", err.Error())
+	}
+
+	return medicalPatient, nil
 }
 
 func buildMedicalPatientQuery(params *dto.MedicalPatientReqParams) string {
@@ -59,15 +78,45 @@ func buildMedicalPatientQuery(params *dto.MedicalPatientReqParams) string {
 	return query
 }
 
-func (m *medicalPatientRepository) GetPatients(params *dto.MedicalPatientReqParams) ([]model.MedicalPatient, error) {
+func (m *medicalPatientRepositoryImpl) GetPatients(params *dto.MedicalPatientReqParams) ([]dto.MedicalPatientResp, error) {
 	query := buildMedicalPatientQuery(params)
 	rows, err := m.db.Query(query)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	//TODO
+	
+  var medicalPatients []dto.MedicalPatientResp
 
-	return nil, nil
+  for rows.Next() {
+    var medicalPatient dto.MedicalPatientResp
+
+    err := rows.Scan(
+      &medicalPatient.IdentityNumber,
+      &medicalPatient.Name,
+      &medicalPatient.PhoneNumber,
+      &medicalPatient.BirthDate,
+      &medicalPatient.Gender,
+      &medicalPatient.IdentityCardScanImg,
+      &medicalPatient.CreatedAt,
+    )
+    
+    if err != nil {
+      return nil, errs.NewErrInternalServerErrors("execute query error [GetMedicalPatients]: ", err.Error())
+    }
+
+    // medicalPatient.CreatedAt = medicalPatient.CreatedAt.Format(time.RFC3339)
+    medicalPatients = append(medicalPatients, medicalPatient)
+  }
+
+  if err := rows.Err(); err != nil {
+    return nil, errs.NewErrInternalServerErrors("execute query error [GetMedicalPatients]: ", err.Error())
+  }
+
+  if len(medicalPatients) == 0 {
+    medicalPatients = []dto.MedicalPatientResp{}
+  }
+
+	return medicalPatients, nil
 
 }

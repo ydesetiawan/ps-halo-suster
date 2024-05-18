@@ -1,13 +1,14 @@
 package handler
 
 import (
-	"github.com/labstack/echo/v4"
 	patientDto "ps-halo-suster/internal/medical/patient/dto"
 	medicalPatientService "ps-halo-suster/internal/medical/patient/service"
 	recordDto "ps-halo-suster/internal/medical/record/dto"
 	medicalRecordService "ps-halo-suster/internal/medical/record/service"
 	"ps-halo-suster/pkg/helper"
 	"ps-halo-suster/pkg/httphelper/response"
+
+	"github.com/labstack/echo/v4"
 )
 
 type MedicalHandler struct {
@@ -31,13 +32,14 @@ func (h *MedicalHandler) CreateMedicalPatient(ctx echo.Context) *response.WebRes
 	err = patientDto.ValidateMedicalPatientReq(request)
 	helper.Panic400IfError(err)
 
-	err = h.medicalPatientService.CreatePatient(request)
+	medicalPatient, err := h.medicalPatientService.CreatePatient(request)
+
 	helper.PanicIfError(err, "CreateMedicalPatient failed")
 
 	return &response.WebResponse{
 		Status:  201,
 		Message: "CreateMedicalPatient Successfully",
-		Data:    nil,
+		Data:    medicalPatient,
 	}
 }
 
@@ -50,7 +52,7 @@ func (h *MedicalHandler) GetMedicalPatient(ctx echo.Context) *response.WebRespon
 
 	return &response.WebResponse{
 		Status:  200,
-		Message: "GetMedicalPatient Successfully",
+		Message: "success",
 		Data:    results,
 	}
 }
