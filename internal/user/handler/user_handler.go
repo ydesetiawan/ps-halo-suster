@@ -23,12 +23,12 @@ func NewUserHandler(userService service.UserService) *UserHandler {
 }
 
 func hasAuthorizeRoleIT(ctx echo.Context, h *UserHandler) error {
-	userInfo, err := handler.ExtractUserInfo(ctx)
+	userId, err := handler.GetUserId(ctx)
 	if err != nil {
 		return err
 	}
 
-	_, err = h.userService.GetUserByIdAndRole(userInfo.UserId, string(model.IT))
+	_, err = h.userService.GetUserByIdAndRole(userId, string(model.IT))
 	if err != nil {
 		return err
 	}

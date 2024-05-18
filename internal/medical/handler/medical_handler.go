@@ -5,6 +5,7 @@ import (
 	medicalPatientService "ps-halo-suster/internal/medical/patient/service"
 	recordDto "ps-halo-suster/internal/medical/record/dto"
 	medicalRecordService "ps-halo-suster/internal/medical/record/service"
+	"ps-halo-suster/pkg/base/handler"
 	"ps-halo-suster/pkg/helper"
 	"ps-halo-suster/pkg/httphelper/response"
 
@@ -64,6 +65,10 @@ func (h *MedicalHandler) CreateRecordPatient(ctx echo.Context) *response.WebResp
 	err = recordDto.ValidateMedicalRecordReq(request)
 	helper.Panic400IfError(err)
 
+	userId, err := handler.GetUserId(ctx)
+	helper.PanicIfError(err, "user unauthorized")
+
+	request.UserId = userId
 	err = h.medicalRecordService.CreateRecord(request)
 	helper.PanicIfError(err, "CreateRecordPatient failed")
 
