@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/labstack/echo/v4"
+	"ps-halo-suster/pkg/errs"
 )
 
 type UserInfo struct {
@@ -30,4 +31,13 @@ func ExtractUserInfo(ctx echo.Context) (*UserInfo, error) {
 		UserId: fmt.Sprintf("%v", userInfo["user_id"]),
 		Role:   fmt.Sprintf("%v", userInfo["role"]),
 	}, nil
+}
+
+func GetUserId(ctx echo.Context) (string, error) {
+	userInfo, err := ExtractUserInfo(ctx)
+	if err != nil {
+		return "", errs.NewErrUnauthorized("user unauthorized")
+	}
+
+	return userInfo.UserId, nil
 }

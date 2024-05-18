@@ -2,17 +2,25 @@ package dto
 
 import (
 	"github.com/go-playground/validator/v10"
+	"strconv"
 	"time"
 )
 
 type MedicalRecordReq struct {
-	IdentityNumber string `json:"identityNumber" validate:"required,len=16,numeric"`
+	IdentityNumber int64  `json:"identityNumber" validate:"required,identityNumberLength"`
 	Symptoms       string `json:"symptoms" validate:"required,min=1,max=2000"`
 	Medications    string `json:"medications" validate:"required,min=1,max=2000"`
+	UserId         string `json:"-"`
+}
+
+func identityNumberLength(fl validator.FieldLevel) bool {
+	identityNumber := strconv.FormatInt(fl.Field().Int(), 10)
+	return len(identityNumber) == 16
 }
 
 func ValidateMedicalRecordReq(req *MedicalRecordReq) error {
 	validate := validator.New()
+	validate.RegisterValidation("identityNumberLength", identityNumberLength)
 	return validate.Struct(req)
 }
 

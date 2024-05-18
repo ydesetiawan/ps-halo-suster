@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"ps-halo-suster/internal/medical/record/dto"
+	"ps-halo-suster/internal/medical/record/model"
+	"ps-halo-suster/pkg/errs"
 	"strings"
 )
 
@@ -15,9 +17,34 @@ func NewMedicalRecordRepositoryImpl(db *sqlx.DB) MedicalRecordRepository {
 	return &medicalRecordRepository{db: db}
 }
 
-func (m *medicalRecordRepository) CreateRecord(request *dto.MedicalRecordReq) error {
-	//TODO implement me
-	panic("implement me")
+const queryCreateRecord = ` WITH check_identity AS (
+        SELECT identity_number
+        FROM medical_patients
+        WHERE identity_number = $1
+    )
+    INSERT INTO medical_records (id, identity_number, symptoms, medications, created_by)
+    SELECT $2, $1, $3, $4, $5
+    FROM check_identity
+    WHERE EXISTS (SELECT 1 FROM check_identity);
+    `
+
+func (m *medicalRecordRepository) CreateRecord(mRecord *model.MedicalRecord) error {
+	result, err := m.db.Exec(queryCreateRecord, mRecord.IdentityNumber, mRecord.ID, mRecord.Symptoms, mRecord.Medications, mRecord.CreatedBy)
+	if err != nil {
+
+		return errs.NewErrInternalServerErrors("Failed to execute query:", err)
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return errs.NewErrInternalServerErrors("Failed to get rows affected:", err)
+	}
+
+	if rowsAffected == 0 {
+		return errs.NewErrDataNotFound("No record inserted, identity number does not exist in medical_patients.", mRecord.IdentityNumber, errs.ErrorData{})
+	}
+
+	return nil
 }
 
 // TODO need to testing

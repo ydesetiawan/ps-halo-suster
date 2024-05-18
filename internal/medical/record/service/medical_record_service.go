@@ -3,8 +3,10 @@ package service
 import (
 	patientRepository "ps-halo-suster/internal/medical/patient/repository"
 	"ps-halo-suster/internal/medical/record/dto"
+	"ps-halo-suster/internal/medical/record/model"
 	"ps-halo-suster/internal/medical/record/repository"
 	userRepository "ps-halo-suster/internal/user/repository"
+	"ps-halo-suster/pkg/helper"
 )
 
 type MedicalRecordService interface {
@@ -29,8 +31,16 @@ func NewMedicalRecordServiceImpl(userRepository userRepository.UserRepository,
 }
 
 func (m *medicalRecordService) CreateRecord(request *dto.MedicalRecordReq) error {
-	//TODO implement me
-	panic("implement me")
+
+	mRecord := &model.MedicalRecord{
+		ID:             helper.GenerateULID(),
+		IdentityNumber: request.IdentityNumber,
+		Symptoms:       request.Symptoms,
+		Medications:    request.Medications,
+		CreatedBy:      request.UserId,
+	}
+
+	return m.medicalRecordRepository.CreateRecord(mRecord)
 }
 
 func (m *medicalRecordService) GetRecords(params *dto.MedicalRecordReqParams) ([]dto.MedicalRecordResp, error) {
