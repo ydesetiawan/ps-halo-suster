@@ -102,7 +102,7 @@ func (m *medicalPatientRepositoryImpl) GetPatients(params *dto.MedicalPatientReq
     )
     
     if err != nil {
-      return nil, errs.NewErrInternalServerErrors("execute query error [GetNurses]: ", err.Error())
+      return nil, errs.NewErrInternalServerErrors("execute query error [GetMedicalPatients]: ", err.Error())
     }
 
     // medicalPatient.CreatedAt = medicalPatient.CreatedAt.Format(time.RFC3339)
@@ -110,7 +110,7 @@ func (m *medicalPatientRepositoryImpl) GetPatients(params *dto.MedicalPatientReq
   }
 
   if err := rows.Err(); err != nil {
-    return nil, errs.NewErrInternalServerErrors("execute query error [GetNurses]: ", err.Error())
+    return nil, errs.NewErrInternalServerErrors("execute query error [GetMedicalPatients]: ", err.Error())
   }
 
   if len(medicalPatients) == 0 {
