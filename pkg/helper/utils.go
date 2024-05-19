@@ -10,6 +10,32 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
+func ValidateISO8601(fl validator.FieldLevel) bool {
+	// List of layouts for various ISO 8601 formats
+	dateStr, ok := fl.Field().Interface().(string)
+	if !ok {
+		// Field is not a string
+		return false
+	}
+	layouts := []string{
+		time.RFC3339,                          // Full date and time
+		"2006-01-02",                          // Date only
+		"2006-01-02T15:04:05Z07:00",           // Date and time with time zone
+		"2006-01-02T15:04:05",                 // Date and time without time zone
+		"2006-01-02T15:04Z07:00",              // Date and time with time zone, no seconds
+		"2006-01-02T15:04",                    // Date and time without time zone, no seconds
+		"2006-01-02T15:04:05.999999999Z07:00", // Date and time with nanoseconds
+	}
+
+	// Try parsing the input string with each layout
+	for _, layout := range layouts {
+		if _, err := time.Parse(layout, dateStr); err == nil {
+			return true
+		}
+	}
+	return false
+}
+
 func ValidateURL(fl validator.FieldLevel) bool {
 	url, ok := fl.Field().Interface().(string)
 	if !ok {
