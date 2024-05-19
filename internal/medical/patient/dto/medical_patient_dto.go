@@ -22,7 +22,7 @@ func ValidateMedicalPatientReq(req *MedicalPatientReq) error {
 	//TODO add validation phone number
 
 	validate.RegisterValidation("identityNumber", func(fl validator.FieldLevel) bool {
-		return len(strconv.Itoa(fl.Field().Interface().(int))) <= 16
+		return len(strconv.Itoa(fl.Field().Interface().(int))) == 16
 	})
 
 	validate.RegisterValidation("validUrl", helper.ValidateURL)

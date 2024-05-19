@@ -18,23 +18,25 @@ func NewMedicalPatientRepositoryImpl(db *sqlx.DB) MedicalPatientRepository {
 	return &medicalPatientRepositoryImpl{db: db}
 }
 
-func (r *medicalPatientRepositoryImpl) CreatePatient(medicalPatient model.MedicalPatient) (model.MedicalPatient, error) {
-  query := `INSERT INTO medical_patients (identity_number, name, phone_number, birth_date, gender, identity_card_scan_img) VALUES ($1, $2, $3, $4, $5, $6)`
-	_, err := r.db.Exec(
-    query, 
-    medicalPatient.IdentityNumber, 
-    medicalPatient.Name, 
-    medicalPatient.PhoneNumber, 
-    medicalPatient.BirthDate, 
-    medicalPatient.Gender, 
-    medicalPatient.IdentityCardScanImg)
-	
-  if err != nil {
-    if strings.Contains(err.Error(), "medical_patients_pkey") {
-      return medicalPatient, errs.NewErrDataConflict("identity number already exists", medicalPatient.IdentityNumber)
-    }
+const queryInsertMedicalPatient = `INSERT INTO medical_patients (identity_number, name, phone_number, birth_date, gender, identity_card_scan_img) VALUES ($1, $2, $3, $4, $5, $6)`
 
-		return medicalPatient, errs.NewErrInternalServerErrors("execute query error [RegisterUser]: ", err.Error())
+func (r *medicalPatientRepositoryImpl) CreatePatient(medicalPatient model.MedicalPatient) (model.MedicalPatient, error) {
+
+	_, err := r.db.Exec(
+		queryInsertMedicalPatient,
+		medicalPatient.IdentityNumber,
+		medicalPatient.Name,
+		medicalPatient.PhoneNumber,
+		medicalPatient.BirthDate,
+		medicalPatient.Gender,
+		medicalPatient.IdentityCardScanImg)
+
+	if err != nil {
+		if strings.Contains(err.Error(), "medical_patients_pkey") {
+			return medicalPatient, errs.NewErrDataConflict("identity number already exists", medicalPatient.IdentityNumber)
+		}
+
+		return medicalPatient, errs.NewErrInternalServerErrors("execute query error [CreatePatient]: ", err.Error())
 	}
 
 	return medicalPatient, nil
@@ -85,37 +87,37 @@ func (m *medicalPatientRepositoryImpl) GetPatients(params *dto.MedicalPatientReq
 		return nil, err
 	}
 	defer rows.Close()
-	
-  var medicalPatients []dto.MedicalPatientResp
 
-  for rows.Next() {
-    var medicalPatient dto.MedicalPatientResp
+	var medicalPatients []dto.MedicalPatientResp
 
-    err := rows.Scan(
-      &medicalPatient.IdentityNumber,
-      &medicalPatient.Name,
-      &medicalPatient.PhoneNumber,
-      &medicalPatient.BirthDate,
-      &medicalPatient.Gender,
-      &medicalPatient.IdentityCardScanImg,
-      &medicalPatient.CreatedAt,
-    )
-    
-    if err != nil {
-      return nil, errs.NewErrInternalServerErrors("execute query error [GetMedicalPatients]: ", err.Error())
-    }
+	for rows.Next() {
+		var medicalPatient dto.MedicalPatientResp
 
-    // medicalPatient.CreatedAt = medicalPatient.CreatedAt.Format(time.RFC3339)
-    medicalPatients = append(medicalPatients, medicalPatient)
-  }
+		err := rows.Scan(
+			&medicalPatient.IdentityNumber,
+			&medicalPatient.PhoneNumber,
+			&medicalPatient.Name,
+			&medicalPatient.BirthDate,
+			&medicalPatient.Gender,
+			&medicalPatient.IdentityCardScanImg,
+			&medicalPatient.CreatedAt,
+		)
 
-  if err := rows.Err(); err != nil {
-    return nil, errs.NewErrInternalServerErrors("execute query error [GetMedicalPatients]: ", err.Error())
-  }
+		if err != nil {
+			return nil, errs.NewErrInternalServerErrors("execute query error [GetMedicalPatients]: ", err.Error())
+		}
 
-  if len(medicalPatients) == 0 {
-    medicalPatients = []dto.MedicalPatientResp{}
-  }
+		// medicalPatient.CreatedAt = medicalPatient.CreatedAt.Format(time.RFC3339)
+		medicalPatients = append(medicalPatients, medicalPatient)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, errs.NewErrInternalServerErrors("execute query error [GetMedicalPatients]: ", err.Error())
+	}
+
+	if len(medicalPatients) == 0 {
+		medicalPatients = []dto.MedicalPatientResp{}
+	}
 
 	return medicalPatients, nil
 
