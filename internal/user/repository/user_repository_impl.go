@@ -71,7 +71,7 @@ const queryUpdateUser = `
     WITH updated AS (
         UPDATE users
         SET name = $1, nip = $2
-        WHERE id = $3
+        WHERE id = $3 and role = $4
         RETURNING *
     )
     SELECT EXISTS(SELECT 1 FROM updated)
@@ -79,7 +79,7 @@ const queryUpdateUser = `
 
 func (r *userRepositoryImpl) UpdateUser(request *dto.UpdateUserReq) error {
 	var exists bool
-	err := r.db.Get(&exists, queryUpdateUser, request.Name, request.NIP, request.ID)
+	err := r.db.Get(&exists, queryUpdateUser, request.Name, request.NIP, request.ID, model.NURSE)
 	if err != nil {
 		return errs.NewErrDataConflict("execute query error [UpdateUser]: ", err.Error())
 	}
@@ -94,7 +94,7 @@ func (r *userRepositoryImpl) UpdateUser(request *dto.UpdateUserReq) error {
 const queryDeleteUser = `
     WITH deleted AS (
         DELETE FROM users
-        WHERE id = $1
+        WHERE id = $1 and role = $2
         RETURNING *
     )
     SELECT EXISTS(SELECT 1 FROM deleted)
@@ -102,7 +102,7 @@ const queryDeleteUser = `
 
 func (r *userRepositoryImpl) DeleteUser(userId string) error {
 	var exists bool
-	err := r.db.Get(&exists, queryDeleteUser, userId)
+	err := r.db.Get(&exists, queryDeleteUser, userId, model.NURSE)
 	if err != nil {
 		return errs.NewErrDataConflict("execute query error [DeleteUser]: ", err.Error())
 	}
