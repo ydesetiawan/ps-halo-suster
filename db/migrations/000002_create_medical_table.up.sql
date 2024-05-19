@@ -13,6 +13,7 @@ CREATE INDEX idx_medical_patients_identity_number ON medical_patients (identity_
 CREATE INDEX idx_medical_patients_phone_number ON medical_patients (phone_number);
 CREATE INDEX idx_medical_patients_name ON medical_patients (name);
 CREATE INDEX idx_medical_patients_gender ON medical_patients (gender);
+CREATE INDEX idx_medical_patients_created_at ON medical_patients (created_at);
 
 CREATE TABLE medical_records (
      id char(26) PRIMARY KEY,
