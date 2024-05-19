@@ -191,15 +191,18 @@ func (r *userRepositoryImpl) GetNurses(params *dto.GetNurseParams) ([]dto.GetNur
 	var nurses []dto.GetNurseResp
 	for rows.Next() {
 		var nurse dto.GetNurseResp
+		var nipString string
 		err := rows.Scan(
 			&nurse.UserId,
-			&nurse.NIP,
+			&nipString,
 			&nurse.Name,
 			&nurse.CreatedAtTime)
 		if err != nil {
 			return nil, errs.NewErrInternalServerErrors("execute query error [GetNurses]: ", err.Error())
 		}
 		nurse.CreatedAt = nurse.CreatedAtTime.Format(time.RFC3339)
+		nipInt, err := strconv.Atoi(nipString)
+		nurse.NIP = nipInt
 		nurses = append(nurses, nurse)
 	}
 	if err := rows.Err(); err != nil {

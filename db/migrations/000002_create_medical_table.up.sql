@@ -9,10 +9,10 @@ CREATE TABLE medical_patients (
 );
 
 -- Create indexes if necessary
-CREATE INDEX idx_users_identity_number ON medical_patients (identity_number);
-CREATE INDEX idx_users_phone_number ON medical_patients (phone_number);
-CREATE INDEX idx_users_name ON medical_patients (name);
-CREATE INDEX idx_users_gender ON medical_patients (gender);
+CREATE INDEX idx_medical_patients_identity_number ON medical_patients (identity_number);
+CREATE INDEX idx_medical_patients_phone_number ON medical_patients (phone_number);
+CREATE INDEX idx_medical_patients_name ON medical_patients (name);
+CREATE INDEX idx_medical_patients_gender ON medical_patients (gender);
 
 CREATE TABLE medical_records (
      id char(26) PRIMARY KEY,
@@ -25,6 +25,6 @@ CREATE TABLE medical_records (
      FOREIGN KEY (created_by) REFERENCES users(id)
 );
 
-CREATE INDEX idx_medical_id ON medical_records (id);
+CREATE INDEX idx_medical_records_id ON medical_records (id);
 CREATE INDEX idx_medical_records_identity_number ON medical_records (identity_number);
 CREATE INDEX idx_medical_records_created_at ON medical_records (created_at);
