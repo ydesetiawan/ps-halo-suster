@@ -2,12 +2,13 @@ package repository
 
 import (
 	"fmt"
-	"github.com/jmoiron/sqlx"
 	"ps-halo-suster/internal/medical/record/dto"
 	"ps-halo-suster/internal/medical/record/model"
 	"ps-halo-suster/pkg/errs"
 	"strings"
 	"time"
+
+	"github.com/jmoiron/sqlx"
 )
 
 type medicalRecordRepository struct {
@@ -23,14 +24,14 @@ const queryCreateRecord = ` WITH check_identity AS (
         FROM medical_patients
         WHERE identity_number = $1
     )
-    INSERT INTO medical_records (id, identity_number, symptoms, medications, created_by)
-    SELECT $2, $1, $3, $4, $5
+    INSERT INTO medical_records (id, identity_number, symptoms, medications, created_by, created_at)
+    SELECT $2, $1, $3, $4, $5, $6
     FROM check_identity
     WHERE EXISTS (SELECT 1 FROM check_identity);
     `
 
 func (m *medicalRecordRepository) CreateRecord(mRecord *model.MedicalRecord) error {
-	result, err := m.db.Exec(queryCreateRecord, mRecord.IdentityNumber, mRecord.ID, mRecord.Symptoms, mRecord.Medications, mRecord.CreatedBy)
+	result, err := m.db.Exec(queryCreateRecord, mRecord.IdentityNumber, mRecord.ID, mRecord.Symptoms, mRecord.Medications, mRecord.CreatedBy, time.Now())
 	if err != nil {
 
 		return errs.NewErrInternalServerErrors("Failed to execute query:", err)
@@ -134,7 +135,7 @@ func (m *medicalRecordRepository) GetRecords(params *dto.MedicalRecordReqParams)
 		if err != nil {
 			return nil, err
 		}
-		record.CreatedAt = createdAt.Format(time.RFC3339)
+		record.CreatedAt = createdAt.Format(time.RFC3339Nano)
 		records = append(records, record)
 	}
 	if len(records) == 0 {
